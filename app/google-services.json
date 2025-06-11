@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "489525450575",
+    "project_id": "app-bf6e1c97",
+    "storage_bucket": "app-bf6e1c97.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:489525450575:android:4bcee0641b533985fad73a",
+        "android_client_info": {
+          "package_name": "com.mieso.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDFl3p3UBGVumAHsolyV89dR2wDHRVbm9c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
