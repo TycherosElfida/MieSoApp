@@ -48,7 +48,7 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(platform(libs.firebase.bom))
 
-    /* ---------- AndroidX / Compose ---------- */
+    /* ── AndroidX / Compose ── */
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -56,26 +56,42 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.navigation.compose)
 
-    /* ---------- Firebase (versions via BoM) ---------- */
+    /* ── Coroutines ── */
+    implementation(libs.kotlinx.coroutines.android)
+
+    /* ── Hilt ── */
+    implementation(libs.hilt.android)
+    implementation(libs.hilt.navigation.compose)
+    ksp(libs.hilt.android.compiler)
+
+    /* ── Room ── */
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
+
+    /* ── Firebase (versions via BoM) ── */
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.auth)
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.database)
     implementation(libs.firebase.functions)
     implementation(libs.firebase.storage)
-    implementation(libs.firebase.ai)
 
-    /* ---------- Identity / Credentials ---------- */
+    /* ── DataStore ── */
+    implementation(libs.datastore.preferences)
+
+    /* ── Coil ── */
+    implementation(libs.coil3.coil.compose)
+    implementation(libs.coil.network.okhttp)
+
+    /* ── Identity / Credentials ── */
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.auth)
     implementation(libs.googleid)
 
-    /* ---------- Hilt DI ---------- */
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.android.compiler)
-
-    /* ---------- Testing ---------- */
+    /* ── Testing ── */
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
