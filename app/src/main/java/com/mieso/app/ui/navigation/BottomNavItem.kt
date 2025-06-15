@@ -4,8 +4,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
-//import androidx.compose.material.icons.outlined.Discount
-//import androidx.compose.material.icons.outlined.ReceiptLong
+import androidx.compose.material.icons.outlined.Discount
+import androidx.compose.material.icons.automirrored.outlined.ReceiptLong
 import androidx.compose.ui.graphics.vector.ImageVector
 
 data class BottomNavItem(
@@ -26,16 +26,16 @@ val bottomNavItems = listOf(
         icon = Icons.Filled.Search,
         screen = Screen.Search
     ),
-//    BottomNavItem(
-//        label = "Orders",
-//        icon = Icons.Outlined.Search,
-//        screen = Screen.Orders
-//    ),
-//    BottomNavItem(
-//        label = "Promo",
-//        icon = Icons.Outlined.Discount,
-//        screen = Screen.Promo
-//    ),
+    BottomNavItem(
+        label = "Orders",
+        icon = Icons.AutoMirrored.Outlined.ReceiptLong,
+        screen = Screen.Orders
+    ),
+    BottomNavItem(
+        label = "Promo",
+        icon = Icons.Outlined.Discount,
+        screen = Screen.Promo
+    ),
     BottomNavItem(
         label = "Profile",
         icon = Icons.Filled.Person,
