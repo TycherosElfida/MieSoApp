@@ -26,16 +26,16 @@ val bottomNavItems = listOf(
         icon = Icons.Filled.Search,
         screen = Screen.Search
     ),
-    BottomNavItem(
-        label = "Orders",
-        icon = Icons.Outlined.Search,
-        screen = Screen.Orders
-    ),
-    BottomNavItem(
-        label = "Promo",
-        icon = Icons.Outlined.Discount,
-        screen = Screen.Promo
-    ),
+//    BottomNavItem(
+//        label = "Orders",
+//        icon = Icons.Outlined.Search,
+//        screen = Screen.Orders
+//    ),
+//    BottomNavItem(
+//        label = "Promo",
+//        icon = Icons.Outlined.Discount,
+//        screen = Screen.Promo
+//    ),
     BottomNavItem(
         label = "Profile",
         icon = Icons.Filled.Person,
