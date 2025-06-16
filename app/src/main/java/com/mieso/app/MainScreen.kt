@@ -26,9 +26,8 @@ fun MainScreen() {
     Scaffold(
         bottomBar = { BottomNavigationBar(navController = navController) }
     ) {
-        // We apply the padding provided by the Scaffold to our NavHost.
-        // This ensures content isn't hidden behind the bottom bar.
         Box(modifier = Modifier.padding(it)) {
+            // Pass navController to AppNavigation
             AppNavigation(navController = navController)
         }
     }
@@ -45,9 +44,6 @@ fun BottomNavigationBar(navController: NavController) {
                 selected = currentRoute == item.screen.route,
                 onClick = {
                     navController.navigate(item.screen.route) {
-                        // This is a professional best practice. It ensures we don't build up a large
-                        // stack of screens on the back stack as the user taps on tabs. It also
-                        // saves and restores the state of each tab.
                         popUpTo(navController.graph.startDestinationId) {
                             saveState = true
                         }

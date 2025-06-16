@@ -1,5 +1,10 @@
 package com.mieso.app.ui.navigation
 
+object NavArguments {
+    const val CATEGORY_ID = "categoryId"
+    const val MENU_ITEM_ID = "menuItemId"
+}
+
 sealed class Screen(val route: String) {
     // Routes for the main bottom navigation bar
     object Home : Screen("home_screen")
@@ -8,10 +13,12 @@ sealed class Screen(val route: String) {
     object Promo : Screen("promo_screen")
     object Profile : Screen("profile_screen")
 
-    // We can add other routes here as we build them, for example:
-    // object Onboarding : Screen("onboarding_screen")
-    // object Login : Screen("login_screen")
-    // object MenuItemDetail : Screen("menu_item_detail_screen/{itemId}") {
-    //     fun createRoute(itemId: String) = "menu_item_detail_screen/$itemId"
-    // }
+    // --- NEW SCREENS ---
+    object Menu : Screen("menu_screen/{${NavArguments.CATEGORY_ID}}") {
+        fun createRoute(categoryId: String) = "menu_screen/$categoryId"
+    }
+
+    object MenuItemDetail : Screen("menu_item_detail_screen/{${NavArguments.MENU_ITEM_ID}}") {
+        fun createRoute(menuItemId: String) = "menu_item_detail_screen/$menuItemId"
+    }
 }
