@@ -37,8 +37,6 @@ class HomeRepositoryImpl @Inject constructor(
         } catch (e: Exception) { emptyList() }
     }
 
-
-    // --- NEW FUNCTION IMPLEMENTATION ---
     override suspend fun getMenuItemsByCategory(categoryId: String): List<MenuItem> {
         return try {
             // Note: In a production app, you might want to fetch the category name
@@ -63,6 +61,19 @@ class HomeRepositoryImpl @Inject constructor(
             // Log the error in a real app
             e.printStackTrace()
             emptyList()
+        }
+    }
+
+    override suspend fun getMenuItemById(menuItemId: String): MenuItem? {
+        return try {
+            firestore.collection("menuItems")
+                .document(menuItemId)
+                .get()
+                .await()
+                .toObject(MenuItem::class.java)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
         }
     }
 }

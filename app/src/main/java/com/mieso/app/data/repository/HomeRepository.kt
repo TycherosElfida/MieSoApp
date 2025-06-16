@@ -8,7 +8,6 @@ interface HomeRepository {
     suspend fun getPromoBanners(): List<PromoBanner>
     suspend fun getCategories(): List<FoodCategory>
     suspend fun getRecommendedItems(): List<MenuItem>
-
-    // --- NEW FUNCTION ---
     suspend fun getMenuItemsByCategory(categoryId: String): List<MenuItem>
+    suspend fun getMenuItemById(menuItemId: String): MenuItem?
 }
