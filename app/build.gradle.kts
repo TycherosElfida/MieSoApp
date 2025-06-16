@@ -40,7 +40,10 @@ android {
     kotlinOptions { jvmTarget = "17" }
 
     buildFeatures { compose = true }
-    composeOptions { kotlinCompilerExtensionVersion = libs.versions.composeBom.get() }
+    composeOptions {
+        kotlinCompilerExtensionVersion = libs.versions.composeBom.get()
+
+    }
 }
 
 dependencies {

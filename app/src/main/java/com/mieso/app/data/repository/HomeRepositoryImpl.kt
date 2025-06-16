@@ -12,43 +12,57 @@ class HomeRepositoryImpl @Inject constructor(
     private val firestore: FirebaseFirestore
 ) : HomeRepository {
 
+    // ... (getPromoBanners, getCategories, getRecommendedItems functions remain the same)
     override suspend fun getPromoBanners(): List<PromoBanner> {
         return try {
-            val snapshot = firestore.collection("promoBanners")
+            firestore.collection("promoBanners")
                 .orderBy("order", Query.Direction.ASCENDING)
-                .get()
-                .await()
-            snapshot.toObjects(PromoBanner::class.java)
-        } catch (e: Exception) {
-            // In a real app, you would log this error.
-            emptyList()
-        }
+                .get().await().toObjects(PromoBanner::class.java)
+        } catch (e: Exception) { emptyList() }
     }
 
     override suspend fun getCategories(): List<FoodCategory> {
         return try {
-            val snapshot = firestore.collection("categories")
+            firestore.collection("categories")
                 .orderBy("order", Query.Direction.ASCENDING)
-                .get()
-                .await()
-            snapshot.toObjects(FoodCategory::class.java)
-        } catch (e: Exception) {
-            // for logging the errors
-            emptyList()
-        }
+                .get().await().toObjects(FoodCategory::class.java)
+        } catch (e: Exception) { emptyList() }
     }
 
     override suspend fun getRecommendedItems(): List<MenuItem> {
         return try {
-            val snapshot = firestore.collection("menuItems")
+            firestore.collection("menuItems")
                 .whereEqualTo("isRecommended", true)
-                .limit(10) // Get up to 10 recommended items
-                .get()
-                .await()
-            snapshot.toObjects(MenuItem::class.java)
+                .limit(10).get().await().toObjects(MenuItem::class.java)
+        } catch (e: Exception) { emptyList() }
+    }
+
+
+    // --- NEW FUNCTION IMPLEMENTATION ---
+    override suspend fun getMenuItemsByCategory(categoryId: String): List<MenuItem> {
+        return try {
+            // Note: In a production app, you might want to fetch the category name
+            // from the categoryId to display in the header. For now, we assume
+            // the ID is sufficient for the query. To do this, we query the 'categories'
+            // collection first, find the document with the matching ID, and then use its 'name'
+            // field in the 'whereEqualTo' clause for 'menuItems'.
+            // For this implementation, we will assume the categoryId passed is the name itself.
+            val categoryDocument = firestore.collection("categories").document(categoryId).get().await()
+            val categoryName = categoryDocument.getString("name") ?: ""
+
+            if (categoryName.isNotEmpty()) {
+                firestore.collection("menuItems")
+                    .whereEqualTo("category", categoryName)
+                    .get()
+                    .await()
+                    .toObjects(MenuItem::class.java)
+            } else {
+                emptyList()
+            }
         } catch (e: Exception) {
+            // Log the error in a real app
+            e.printStackTrace()
             emptyList()
         }
     }
 }
-

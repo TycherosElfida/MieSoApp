@@ -12,6 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.mieso.app.ui.home.HomeScreen
+import com.mieso.app.ui.menu.MenuScreen
 import com.mieso.app.ui.orders.OrdersScreen
 import com.mieso.app.ui.profile.ProfileScreen
 import com.mieso.app.ui.promo.PromoScreen
@@ -24,7 +25,6 @@ fun AppNavigation(navController: NavHostController) {
         startDestination = Screen.Home.route
     ) {
         composable(Screen.Home.route) {
-            // Pass the NavController to HomeScreen so it can navigate
             HomeScreen(navController = navController)
         }
         composable(Screen.Search.route) { SearchScreen() }
@@ -32,17 +32,13 @@ fun AppNavigation(navController: NavHostController) {
         composable(Screen.Promo.route) { PromoScreen() }
         composable(Screen.Profile.route) { ProfileScreen() }
 
-        // --- NEW DESTINATIONS ---
         composable(
             route = Screen.Menu.route,
             arguments = listOf(navArgument(NavArguments.CATEGORY_ID) { type = NavType.StringType })
-        ) { backStackEntry ->
-            // The MenuScreen will extract the categoryId from the backStackEntry
-            val categoryId = backStackEntry.arguments?.getString(NavArguments.CATEGORY_ID)
-            // Placeholder UI for now
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(text = "Menu Screen for Category: $categoryId")
-            }
+        ) {
+            // We now call our actual MenuScreen composable.
+            // The MenuViewModel inside it will automatically handle getting the categoryId.
+            MenuScreen(navController = navController)
         }
 
         composable(
