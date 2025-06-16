@@ -13,6 +13,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.mieso.app.ui.home.HomeScreen
 import com.mieso.app.ui.menu.MenuScreen
+import com.mieso.app.ui.menu.detail.MenuItemDetailScreen
 import com.mieso.app.ui.orders.OrdersScreen
 import com.mieso.app.ui.profile.ProfileScreen
 import com.mieso.app.ui.promo.PromoScreen
@@ -44,12 +45,8 @@ fun AppNavigation(navController: NavHostController) {
         composable(
             route = Screen.MenuItemDetail.route,
             arguments = listOf(navArgument(NavArguments.MENU_ITEM_ID) { type = NavType.StringType })
-        ) { backStackEntry ->
-            val menuItemId = backStackEntry.arguments?.getString(NavArguments.MENU_ITEM_ID)
-            // Placeholder UI for now
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(text = "Detail Screen for Item: $menuItemId")
-            }
+        ) {
+            MenuItemDetailScreen(navController = navController)
         }
     }
 }
