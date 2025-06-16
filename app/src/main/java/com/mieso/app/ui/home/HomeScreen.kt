@@ -22,12 +22,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import com.mieso.app.data.model.FoodCategory
 import com.mieso.app.data.model.MenuItem
 import com.mieso.app.data.model.PromoBanner
 import com.mieso.app.ui.home.viewmodel.HomeViewModel
+import com.mieso.app.ui.navigation.Screen
 import kotlinx.coroutines.delay
 import java.text.NumberFormat
 import java.util.Locale
@@ -39,7 +41,6 @@ fun HomeScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    // Handle potential errors from the ViewModel
     if (uiState.error != null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text(text = uiState.error!!)
@@ -56,11 +57,23 @@ fun HomeScreen(
         item { PromoBanners(banners = uiState.promoBanners, isLoading = uiState.isLoading) }
         item {
             SectionHeader(title = "Kategori")
-            CategoryChips(categories = uiState.categories, isLoading = uiState.isLoading)
+            CategoryChips(
+                categories = uiState.categories,
+                isLoading = uiState.isLoading,
+                onCategoryClick = { categoryId ->
+                    navController.navigate(Screen.Menu.createRoute(categoryId))
+                }
+            )
         }
         item {
             SectionHeader(title = "Rekomendasi Untukmu")
-            MenuItemCarousel(items = uiState.recommendedItems, isLoading = uiState.isLoading)
+            MenuItemCarousel(
+                items = uiState.recommendedItems,
+                isLoading = uiState.isLoading,
+                onItemClick = { menuItemId ->
+                    navController.navigate(Screen.MenuItemDetail.createRoute(menuItemId))
+                }
+            )
         }
     }
 }
@@ -120,13 +133,11 @@ fun PromoBanners(banners: List<PromoBanner>, isLoading: Boolean) {
     }
 
     if (banners.isEmpty()) {
-        // Don't show anything if there are no banners, or show a placeholder.
         return
     }
 
     val pagerState = rememberPagerState(pageCount = { banners.size })
 
-    // FIX: Only run the auto-scroll effect if there's more than one page.
     LaunchedEffect(pagerState.pageCount) {
         if (pagerState.pageCount > 1) {
             while (true) {
@@ -190,9 +201,13 @@ fun SectionHeader(title: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun CategoryChips(categories: List<FoodCategory>, isLoading: Boolean, modifier: Modifier = Modifier) {
+fun CategoryChips(
+    categories: List<FoodCategory>,
+    isLoading: Boolean,
+    onCategoryClick: (categoryId: String) -> Unit
+) {
     LazyRow(
-        modifier = modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         contentPadding = PaddingValues(vertical = 4.dp, horizontal = 16.dp)
     ) {
@@ -209,7 +224,7 @@ fun CategoryChips(categories: List<FoodCategory>, isLoading: Boolean, modifier: 
             items(categories, key = { it.id }) { category ->
                 FilterChip(
                     selected = false,
-                    onClick = { /* TODO: Navigate to category screen */ },
+                    onClick = { onCategoryClick(category.id) },
                     label = { Text(category.name) }
                 )
             }
@@ -218,7 +233,11 @@ fun CategoryChips(categories: List<FoodCategory>, isLoading: Boolean, modifier: 
 }
 
 @Composable
-fun MenuItemCarousel(items: List<MenuItem>, isLoading: Boolean) {
+fun MenuItemCarousel(
+    items: List<MenuItem>,
+    isLoading: Boolean,
+    onItemClick: (menuItemId: String) -> Unit
+) {
     LazyRow(
         contentPadding = PaddingValues(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -234,16 +253,24 @@ fun MenuItemCarousel(items: List<MenuItem>, isLoading: Boolean) {
             }
         } else {
             items(items, key = { it.id }) { item ->
-                MenuItemCard(item)
+                MenuItemCard(
+                    item = item,
+                    // FIX: Pass the navigation logic here
+                    onClick = { onItemClick(item.id) }
+                )
             }
         }
     }
 }
 
+// FIX: Changed NavController to a simple onClick lambda
 @Composable
-fun MenuItemCard(item: MenuItem) {
+fun MenuItemCard(
+    item: MenuItem,
+    onClick: () -> Unit
+) {
     Card(
-        onClick = { /* TODO: Navigate to item detail screen */ },
+        onClick = onClick,
         modifier = Modifier.width(160.dp),
         shape = RoundedCornerShape(12.dp)
     ) {
@@ -259,7 +286,6 @@ fun MenuItemCard(item: MenuItem) {
             Column(modifier = Modifier.padding(12.dp)) {
                 Text(text = item.name, style = MaterialTheme.typography.titleSmall, maxLines = 1)
                 Spacer(modifier = Modifier.height(4.dp))
-                // FIX: Format the price correctly from Long to a Rupiah String
                 Text(
                     text = formatToRupiah(item.price),
                     style = MaterialTheme.typography.bodyMedium,
@@ -271,10 +297,9 @@ fun MenuItemCard(item: MenuItem) {
     }
 }
 
-// Helper function to format a Long to Indonesian Rupiah currency string
 fun formatToRupiah(price: Long): String {
     val localeID = Locale("in", "ID")
     val formatter = NumberFormat.getCurrencyInstance(localeID)
-    formatter.maximumFractionDigits = 0 // We don't need decimal points for Rupiah
+    formatter.maximumFractionDigits = 0
     return formatter.format(price)
 }

@@ -16,7 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MenuViewModel @Inject constructor(
     private val homeRepository: HomeRepository,
-    savedStateHandle: SavedStateHandle // Injected by Hilt to access navigation arguments
+    savedStateHandle: SavedStateHandle // Injected by Hilt to access navigation arguments.
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MenuUiState())
@@ -37,16 +37,19 @@ class MenuViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true) }
             try {
                 val items = homeRepository.getMenuItemsByCategory(categoryId)
-                // In a real app, you would fetch the category document to get its name
-                // For now, we'll just show a generic title or use the ID.
+                // Set the category title from the first item found.
+                // A more robust solution might fetch the category name separately.
+                val title = items.firstOrNull()?.category ?: "Menu"
+
                 _uiState.update {
                     it.copy(
                         isLoading = false,
                         menuItems = items,
-                        categoryTitle = "Menu" // Placeholder title
+                        categoryTitle = title
                     )
                 }
             } catch (e: Exception) {
+                e.printStackTrace()
                 _uiState.update { it.copy(isLoading = false, error = "Failed to load menu.") }
             }
         }
