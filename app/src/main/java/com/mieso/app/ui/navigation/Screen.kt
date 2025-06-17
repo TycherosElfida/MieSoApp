@@ -26,4 +26,6 @@ sealed class Screen(val route: String) {
     object MenuItemDetail : Screen("menu_item_detail_screen/{${NavArguments.MENU_ITEM_ID}}") {
         fun createRoute(menuItemId: String) = "menu_item_detail_screen/$menuItemId"
     }
+
+    object Checkout : Screen("checkout_screen")
 }

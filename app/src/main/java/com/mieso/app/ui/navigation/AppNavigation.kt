@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.mieso.app.ui.cart.CartScreen
+import com.mieso.app.ui.checkout.CheckoutScreen
 import com.mieso.app.ui.home.HomeScreen
 import com.mieso.app.ui.menu.MenuScreen
 import com.mieso.app.ui.menu.detail.MenuItemDetailScreen
@@ -48,7 +49,11 @@ fun AppNavigation(navController: NavHostController) {
         }
 
         composable(Screen.Cart.route) {
-            CartScreen() // The CartScreen gets its own shared ViewModel instance.
+            CartScreen()
+        }
+
+        composable(Screen.Checkout.route) {
+            CheckoutScreen(navController = navController)
         }
     }
 }
