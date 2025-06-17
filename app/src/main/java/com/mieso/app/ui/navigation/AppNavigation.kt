@@ -1,16 +1,12 @@
 package com.mieso.app.ui.navigation
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.mieso.app.ui.cart.CartScreen
 import com.mieso.app.ui.home.HomeScreen
 import com.mieso.app.ui.menu.MenuScreen
 import com.mieso.app.ui.menu.detail.MenuItemDetailScreen
@@ -28,17 +24,19 @@ fun AppNavigation(navController: NavHostController) {
         composable(Screen.Home.route) {
             HomeScreen(navController = navController)
         }
+
         composable(Screen.Search.route) { SearchScreen() }
+
         composable(Screen.Orders.route) { OrdersScreen() }
+
         composable(Screen.Promo.route) { PromoScreen() }
+
         composable(Screen.Profile.route) { ProfileScreen() }
 
         composable(
             route = Screen.Menu.route,
             arguments = listOf(navArgument(NavArguments.CATEGORY_ID) { type = NavType.StringType })
         ) {
-            // We now call our actual MenuScreen composable.
-            // The MenuViewModel inside it will automatically handle getting the categoryId.
             MenuScreen(navController = navController)
         }
 
@@ -47,6 +45,10 @@ fun AppNavigation(navController: NavHostController) {
             arguments = listOf(navArgument(NavArguments.MENU_ITEM_ID) { type = NavType.StringType })
         ) {
             MenuItemDetailScreen(navController = navController)
+        }
+
+        composable(Screen.Cart.route) {
+            CartScreen() // The CartScreen gets its own shared ViewModel instance.
         }
     }
 }

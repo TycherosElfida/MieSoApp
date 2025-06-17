@@ -6,6 +6,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,19 +19,25 @@ import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.mieso.app.ui.home.formatToRupiah
 import com.mieso.app.ui.menu.detail.viewmodel.MenuItemDetailViewModel
+import com.mieso.app.ui.cart.viewmodel.CartViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MenuItemDetailScreen(
     navController: NavController,
-    viewModel: MenuItemDetailViewModel = hiltViewModel()
+    detailViewModel: MenuItemDetailViewModel = hiltViewModel(),
+    cartViewModel: CartViewModel = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val detailState by detailViewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text(text = uiState.menuItem?.name ?: "Detail") },
+                title = { Text(text = detailState.menuItem?.name ?: "Detail") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -39,28 +46,38 @@ fun MenuItemDetailScreen(
             )
         },
         bottomBar = {
-            // The "Add to Cart" button is placed in the bottom bar for easy access.
             AddToCartFooter(
-                price = uiState.totalPrice,
-                onAddToCart = { viewModel.onAddToCartClicked() }
+                price = detailState.totalPrice,
+                onAddToCart = {
+                    detailState.menuItem?.let { item ->
+                        // Call the addToCart function on the shared CartViewModel
+                        cartViewModel.addToCart(item, detailState.quantity)
+                        // Show a confirmation message to the user
+                        scope.launch {
+                            snackbarHostState.showSnackbar("Added to cart!")
+                        }
+                    }
+                }
             )
         }
     ) { paddingValues ->
-        if (uiState.isLoading) {
+        // The rest of the screen's layout code, which displays the item details,
+        // remains unchanged as its state is correctly managed by the detailViewModel.
+        if (detailState.isLoading) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
-        } else if (uiState.error != null) {
+        } else if (detailState.error != null) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(text = uiState.error!!)
+                Text(text = detailState.error!!)
             }
-        } else if (uiState.menuItem != null) {
-            val item = uiState.menuItem!!
+        } else if (detailState.menuItem != null) {
+            val item = detailState.menuItem!!
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .verticalScroll(rememberScrollState()) // Make the content scrollable
+                    .verticalScroll(rememberScrollState())
             ) {
                 AsyncImage(
                     model = item.imageUrl,
@@ -79,10 +96,12 @@ fun MenuItemDetailScreen(
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
+                    HorizontalDivider(
+                        modifier = Modifier.padding(vertical = 16.dp)
+                    )
                     QuantitySelector(
-                        quantity = uiState.quantity,
-                        onQuantityChanged = viewModel::onQuantityChanged
+                        quantity = detailState.quantity,
+                        onQuantityChanged = detailViewModel::onQuantityChanged
                     )
                 }
             }
