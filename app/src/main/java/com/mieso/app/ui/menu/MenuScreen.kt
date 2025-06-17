@@ -64,7 +64,7 @@ fun MenuScreen(
             }
             else -> {
                 LazyVerticalGrid(
-                    columns = GridCells.Fixed(2), // Defines the two-column layout.
+                    columns = GridCells.Fixed(2),
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues),

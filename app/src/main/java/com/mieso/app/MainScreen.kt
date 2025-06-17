@@ -15,7 +15,6 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.mieso.app.ui.navigation.AppNavigation
-import com.mieso.app.ui.navigation.Screen
 import com.mieso.app.ui.navigation.bottomNavItems
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")

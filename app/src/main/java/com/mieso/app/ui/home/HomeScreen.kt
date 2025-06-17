@@ -22,7 +22,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import com.mieso.app.data.model.FoodCategory
@@ -263,7 +262,6 @@ fun MenuItemCarousel(
     }
 }
 
-// FIX: Changed NavController to a simple onClick lambda
 @Composable
 fun MenuItemCard(
     item: MenuItem,

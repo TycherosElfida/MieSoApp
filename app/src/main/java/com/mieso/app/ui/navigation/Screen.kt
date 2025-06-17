@@ -6,14 +6,19 @@ object NavArguments {
 }
 
 sealed class Screen(val route: String) {
-    // Routes for the main bottom navigation bar
+
     object Home : Screen("home_screen")
+
     object Search : Screen("search_screen")
+
     object Orders : Screen("orders_screen")
+
     object Promo : Screen("promo_screen")
+
     object Profile : Screen("profile_screen")
 
-    // --- NEW SCREENS ---
+    object Cart : Screen("cart_screen")
+
     object Menu : Screen("menu_screen/{${NavArguments.CATEGORY_ID}}") {
         fun createRoute(categoryId: String) = "menu_screen/$categoryId"
     }

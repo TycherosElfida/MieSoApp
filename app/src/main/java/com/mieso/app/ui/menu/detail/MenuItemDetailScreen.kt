@@ -79,7 +79,7 @@ fun MenuItemDetailScreen(
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    Divider(modifier = Modifier.padding(vertical = 16.dp))
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
                     QuantitySelector(
                         quantity = uiState.quantity,
                         onQuantityChanged = viewModel::onQuantityChanged
