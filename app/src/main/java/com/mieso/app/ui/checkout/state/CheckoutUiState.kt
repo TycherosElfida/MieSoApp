@@ -7,5 +7,7 @@ enum class ServiceType { DELIVERY, DINE_IN, TAKE_AWAY, NONE }
 data class CheckoutUiState(
     val selectedServiceType: ServiceType = ServiceType.NONE,
     val userAddresses: List<UserAddress> = emptyList(),
-    val selectedAddress: UserAddress? = null
+    val selectedAddress: UserAddress? = null,
+    val isLoading: Boolean = false,
+    val error: String? = null
 )

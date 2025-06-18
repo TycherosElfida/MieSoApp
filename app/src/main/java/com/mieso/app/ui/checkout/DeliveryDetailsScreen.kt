@@ -43,7 +43,8 @@ fun DeliveryDetailsScreen(
                 // *** PERMISSION GRANTED: Call the ViewModel to fetch location ***
                 viewModel.fetchCurrentLocationAsAddress()
             } else {
-                // TODO: Show a message explaining why the feature is unavailable.
+                // TODO: Show a user-friendly message explaining why the feature is unavailable
+                // without the permission. For example, using a Snackbar.
             }
         }
     )

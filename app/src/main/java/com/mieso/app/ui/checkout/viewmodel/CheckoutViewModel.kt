@@ -70,23 +70,28 @@ class CheckoutViewModel @Inject constructor(
 
     fun fetchCurrentLocationAsAddress() {
         viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, error = null) } // Set loading state
             locationRepository.getCurrentLocation().collect { location ->
                 if (location != null) {
                     val address = locationRepository.reverseGeocode(location)
                     if (address != null) {
-                        // Update the state with the newly found address and select it
-                        _uiState.update {
-                            val updatedAddresses = it.userAddresses.toMutableList()
-                            // Remove any previous "Current Location" to avoid duplicates
-                            updatedAddresses.removeAll { addr -> addr.label == "Lokasi Saat Ini" }
+                        _uiState.update { currentState ->
+                            val updatedAddresses = currentState.userAddresses.toMutableList()
+                            updatedAddresses.removeAll { it.label == "Lokasi Saat Ini" }
                             updatedAddresses.add(0, address)
-                            it.copy(userAddresses = updatedAddresses, selectedAddress = address)
+                            currentState.copy(
+                                isLoading = false, // Turn off loading
+                                userAddresses = updatedAddresses,
+                                selectedAddress = address
+                            )
                         }
                     } else {
                         // Handle reverse geocoding failure
+                        _uiState.update { it.copy(isLoading = false, error = "Gagal mendapatkan detail alamat dari lokasi Anda.") }
                     }
                 } else {
                     // Handle location fetch failure
+                    _uiState.update { it.copy(isLoading = false, error = "Gagal mendapatkan lokasi Anda.") }
                 }
             }
         }
