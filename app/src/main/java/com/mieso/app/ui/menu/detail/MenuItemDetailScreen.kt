@@ -92,7 +92,7 @@ fun MenuItemDetailScreen(
                     Text(text = item.name, style = MaterialTheme.typography.headlineMedium)
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        text = "A placeholder description for the delicious ${item.name}. This section would contain more details about the ingredients and preparation.",
+                        text = "${item.description}.",
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

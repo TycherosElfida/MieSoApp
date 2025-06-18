@@ -34,10 +34,10 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_23
+        targetCompatibility = JavaVersion.VERSION_23
     }
-    kotlinOptions { jvmTarget = "17" }
+    kotlinOptions { jvmTarget = "23" }
 
     buildFeatures { compose = true }
     composeOptions {
@@ -104,4 +104,5 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation(libs.kotlinx.coroutines.play.services)
+    implementation(libs.play.services.location)
 }

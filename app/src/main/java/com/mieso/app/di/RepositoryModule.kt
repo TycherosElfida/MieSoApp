@@ -4,6 +4,8 @@ import com.mieso.app.data.repository.HomeRepository
 import com.mieso.app.data.repository.HomeRepositoryImpl
 import com.mieso.app.data.repository.CartRepository
 import com.mieso.app.data.repository.CartRepositoryImpl
+import com.mieso.app.data.repository.UserRepository
+import com.mieso.app.data.repository.UserRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -25,4 +27,10 @@ abstract class RepositoryModule {
     abstract fun bindCartRepository(
         cartRepositoryImpl: CartRepositoryImpl
     ): CartRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindUserRepository(
+        userRepositoryImpl: UserRepositoryImpl
+    ): UserRepository
 }

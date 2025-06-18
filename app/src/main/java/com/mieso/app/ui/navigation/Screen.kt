@@ -28,4 +28,6 @@ sealed class Screen(val route: String) {
     }
 
     object Checkout : Screen("checkout_screen")
+
+    object AddAddress : Screen("add_address_screen")
 }

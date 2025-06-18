@@ -55,5 +55,15 @@ fun AppNavigation(navController: NavHostController) {
         composable(Screen.Checkout.route) {
             CheckoutScreen(navController = navController)
         }
+
+        composable(Screen.AddAddress.route) {
+            AddAddressScreen(navController = navController)
+        }
+
     }
+}
+
+@Composable
+fun AddAddressScreen(navController: NavHostController) {
+    TODO("Not yet implemented")
 }
