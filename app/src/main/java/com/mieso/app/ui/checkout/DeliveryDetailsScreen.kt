@@ -62,7 +62,7 @@ fun DeliveryDetailsScreen(
         },
         bottomBar = {
             Button(
-                onClick = { /* TODO: Navigate to Payment Selection */ },
+                onClick = { navController.navigate(Screen.Payment.route) },
                 modifier = Modifier.fillMaxWidth().padding(16.dp).height(50.dp),
                 enabled = uiState.selectedAddress != null
             ) {

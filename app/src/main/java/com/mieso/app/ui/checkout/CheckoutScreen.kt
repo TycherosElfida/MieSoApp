@@ -20,6 +20,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.mieso.app.ui.checkout.state.ServiceType
 import com.mieso.app.ui.checkout.viewmodel.CheckoutViewModel
+import com.mieso.app.ui.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -73,7 +74,18 @@ fun CheckoutScreen(
             }
 
             Button(
-                onClick = { /* TODO: Navigate to next checkout step */ },
+                onClick = {
+                    // MODIFIED: Added navigation logic based on selection
+                    when (uiState.selectedServiceType) {
+                        ServiceType.DELIVERY -> {
+                            navController.navigate(Screen.DeliveryDetails.route)
+                        }
+                        // TODO: Implement navigation for Dine-in and Take Away in the future
+                        ServiceType.DINE_IN -> { /* Navigate to a table scanner screen, for example */ }
+                        ServiceType.TAKE_AWAY -> { /* Navigate directly to payment */ }
+                        ServiceType.NONE -> { /* Button is disabled, nothing happens */ }
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),

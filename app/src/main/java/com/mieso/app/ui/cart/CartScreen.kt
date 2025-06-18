@@ -20,16 +20,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.mieso.app.data.model.CartItem
 import com.mieso.app.ui.cart.viewmodel.CartViewModel
 import com.mieso.app.ui.home.formatToRupiah
+import com.mieso.app.ui.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CartScreen(
-    // We get the shared CartViewModel instance. Hilt provides the same instance
-    // that is used by the MenuItemDetailScreen and the MainScreen.
+    navController: NavController,
     viewModel: CartViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -42,7 +43,10 @@ fun CartScreen(
             if (uiState.cartItems.isNotEmpty()) {
                 CartSummaryFooter(
                     totalPrice = uiState.totalPrice,
-                    onCheckoutClicked = { /* TODO: Navigate to checkout flow */ }
+                    onCheckoutClicked = {
+                        // This is the navigation logic to add
+                        navController.navigate(Screen.Checkout.route)
+                    }
                 )
             }
         }
