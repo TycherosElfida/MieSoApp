@@ -20,7 +20,7 @@ class CheckoutViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     // For this prototype, we'll use a hardcoded user ID.
-    private val userId = "user_12345"
+    private val userId = "Eric_lil_KT"
 
     init {
         // Start observing user addresses as soon as the ViewModel is created.
