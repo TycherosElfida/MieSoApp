@@ -3,6 +3,7 @@ package com.mieso.app.ui.checkout.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mieso.app.data.model.UserAddress
+import com.mieso.app.data.repository.LocationRepository
 import com.mieso.app.data.repository.UserRepository
 import com.mieso.app.ui.checkout.state.CheckoutUiState
 import com.mieso.app.ui.checkout.state.ServiceType
@@ -13,7 +14,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CheckoutViewModel @Inject constructor(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val locationRepository: LocationRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CheckoutUiState())
@@ -63,6 +65,30 @@ class CheckoutViewModel @Inject constructor(
             userRepository.addAddress(userId, newAddress)
             // After saving, the Firestore listener in our init block will
             // automatically update the userAddresses list in the UI state.
+        }
+    }
+
+    fun fetchCurrentLocationAsAddress() {
+        viewModelScope.launch {
+            locationRepository.getCurrentLocation().collect { location ->
+                if (location != null) {
+                    val address = locationRepository.reverseGeocode(location)
+                    if (address != null) {
+                        // Update the state with the newly found address and select it
+                        _uiState.update {
+                            val updatedAddresses = it.userAddresses.toMutableList()
+                            // Remove any previous "Current Location" to avoid duplicates
+                            updatedAddresses.removeAll { addr -> addr.label == "Lokasi Saat Ini" }
+                            updatedAddresses.add(0, address)
+                            it.copy(userAddresses = updatedAddresses, selectedAddress = address)
+                        }
+                    } else {
+                        // Handle reverse geocoding failure
+                    }
+                } else {
+                    // Handle location fetch failure
+                }
+            }
         }
     }
 }

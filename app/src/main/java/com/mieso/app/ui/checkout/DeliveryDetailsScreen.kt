@@ -40,9 +40,10 @@ fun DeliveryDetailsScreen(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { isGranted ->
             if (isGranted) {
-                // TODO: Permission granted. Get location from FusedLocationProviderClient.
+                // *** PERMISSION GRANTED: Call the ViewModel to fetch location ***
+                viewModel.fetchCurrentLocationAsAddress()
             } else {
-                // TODO: Permission denied. Show a message to the user.
+                // TODO: Show a message explaining why the feature is unavailable.
             }
         }
     )
