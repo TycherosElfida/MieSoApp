@@ -1,5 +1,7 @@
 package com.mieso.app.di
 
+import com.mieso.app.data.repository.AuthRepository
+import com.mieso.app.data.repository.AuthRepositoryImpl
 import com.mieso.app.data.repository.HomeRepository
 import com.mieso.app.data.repository.HomeRepositoryImpl
 import com.mieso.app.data.repository.CartRepository
@@ -49,4 +51,10 @@ abstract class RepositoryModule {
     abstract fun bindOrderRepository(
         orderRepositoryImpl: OrderRepositoryImpl
     ): OrderRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindAuthRepository(
+        authRepositoryImpl: AuthRepositoryImpl
+    ): AuthRepository
 }

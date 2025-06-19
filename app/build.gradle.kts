@@ -68,6 +68,7 @@ dependencies {
     /* ── Hilt ── */
     implementation(libs.hilt.android)
     implementation(libs.hilt.navigation.compose)
+    implementation(libs.play.services.auth)
     ksp(libs.hilt.android.compiler)
 
     /* ── Room ── */

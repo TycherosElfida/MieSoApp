@@ -26,6 +26,7 @@ googleGms               = "4.4.2"
 junit                   = "4.13.2"
 junitVersion            = "1.2.1"
 espressoCore            = "3.6.1"
+playServicesAuth = "21.3.0"
 
 # ─────────── libraries ──────────
 [libraries]
@@ -84,6 +85,7 @@ googleid                            = { group = "com.google.android.libraries.id
 junit                               = { group = "junit",                        name = "junit",                      version.ref = "junit" }
 androidx-junit                      = { group = "androidx.test.ext",            name = "junit",                      version.ref = "junitVersion" }
 androidx-espresso-core              = { group = "androidx.test.espresso",       name = "espresso-core",              version.ref = "espressoCore" }
+play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }
 
 # ─────────── plugins ───────────
 [plugins]
