@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.mieso.app.ui.cart.CartScreen
+import com.mieso.app.ui.checkout.AddAddressScreen
 import com.mieso.app.ui.checkout.CheckoutScreen
 import com.mieso.app.ui.checkout.DeliveryDetailsScreen
 import com.mieso.app.ui.home.HomeScreen
@@ -58,7 +59,7 @@ fun AppNavigation(navController: NavHostController) {
             CheckoutScreen(navController = navController)
         }
 
-        composable(Screen.AddAddress.route) {
+        composable(Screen.AddAddressScreen.route) {
             AddAddressScreen(navController = navController)
         }
 
@@ -71,9 +72,4 @@ fun AppNavigation(navController: NavHostController) {
         }
 
     }
-}
-
-@Composable
-fun AddAddressScreen(navController: NavHostController) {
-    TODO("Not yet implemented")
 }

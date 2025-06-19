@@ -19,7 +19,7 @@ import com.mieso.app.ui.checkout.viewmodel.CheckoutViewModel
 @Composable
 fun AddAddressScreen(
     navController: NavController,
-    viewModel: CheckoutViewModel = hiltViewModel() // Use the shared ViewModel
+    viewModel: CheckoutViewModel = hiltViewModel()
 ) {
     // Local state for the form fields
     var label by remember { mutableStateOf("") }

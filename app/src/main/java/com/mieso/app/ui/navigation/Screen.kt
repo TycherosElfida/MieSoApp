@@ -29,7 +29,7 @@ sealed class Screen(val route: String) {
 
     object Checkout : Screen("checkout_screen")
 
-    object AddAddress : Screen("add_address_screen")
+    object AddAddressScreen : Screen("add_address_screen")
 
     object DeliveryDetails : Screen("delivery_details_screen")
 

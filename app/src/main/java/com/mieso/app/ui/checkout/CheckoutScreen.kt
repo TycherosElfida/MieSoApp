@@ -80,10 +80,15 @@ fun CheckoutScreen(
                         ServiceType.DELIVERY -> {
                             navController.navigate(Screen.DeliveryDetails.route)
                         }
-                        // TODO: Implement navigation for Dine-in and Take Away in the future
-                        ServiceType.DINE_IN -> { /* Navigate to a table scanner screen, for example */ }
-                        ServiceType.TAKE_AWAY -> { /* Navigate directly to payment */ }
-                        ServiceType.NONE -> { /* Button is disabled, nothing happens */ }
+                        ServiceType.DINE_IN -> {
+                            //bloman
+                        }
+                        ServiceType.TAKE_AWAY -> {
+                            navController.navigate(Screen.Payment.route)
+                        }
+                        ServiceType.NONE -> {
+
+                        }
                     }
                 },
                 modifier = Modifier

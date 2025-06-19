@@ -89,7 +89,7 @@ fun DeliveryDetailsScreen(
                     title = "Tambah Alamat Baru",
                     icon = Icons.Outlined.AddLocation,
                     onClick = {
-                        navController.navigate(Screen.AddAddress.route)
+                        navController.navigate(Screen.AddAddressScreen.route)
                     }
                 )
             }
