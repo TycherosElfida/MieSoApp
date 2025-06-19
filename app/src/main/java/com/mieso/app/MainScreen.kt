@@ -26,10 +26,9 @@ import com.mieso.app.ui.navigation.bottomNavItems
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun MainScreen(
-    cartViewModel: CartViewModel = hiltViewModel()
-) {
+fun MainScreen() {
     val navController = rememberNavController()
+    val cartViewModel: CartViewModel = hiltViewModel()
     val cartState by cartViewModel.uiState.collectAsState()
 
     Scaffold(
@@ -68,7 +67,6 @@ fun BottomNavigationBar(navController: NavController, cartItemCount: Int) {
                 },
                 label = { Text(text = item.label) },
                 icon = {
-                    // If this is the Cart tab and there are items, show the badge
                     if (item.screen == Screen.Cart && cartItemCount > 0) {
                         BadgedBox(
                             badge = {

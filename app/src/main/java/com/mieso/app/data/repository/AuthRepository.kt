@@ -6,6 +6,10 @@ import kotlinx.coroutines.flow.Flow
 
 interface AuthRepository {
     fun getAuthState(): Flow<FirebaseUser?>
-    suspend fun googleSignIn(idToken: String): SignInResult
+    suspend fun firebaseSignInWithGoogle(idToken: String): SignInResult
     suspend fun signOut()
+
+    suspend fun createUserWithEmail(email: String, password: String): SignInResult
+
+    suspend fun signInWithEmail(email: String, password: String): SignInResult
 }

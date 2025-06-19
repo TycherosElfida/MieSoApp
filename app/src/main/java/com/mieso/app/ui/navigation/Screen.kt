@@ -7,6 +7,10 @@ object NavArguments {
 
 sealed class Screen(val route: String) {
 
+    object Login : Screen("login_screen")
+
+    object Main : Screen("main_screen")
+
     object Home : Screen("home_screen")
 
     object Search : Screen("search_screen")
