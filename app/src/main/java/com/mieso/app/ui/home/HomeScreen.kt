@@ -32,6 +32,7 @@ import com.mieso.app.ui.navigation.Screen
 import kotlinx.coroutines.delay
 import java.text.NumberFormat
 import java.util.Locale
+import androidx.compose.foundation.clickable // -> Tambahkan import ini
 
 @Composable
 fun HomeScreen(
@@ -52,7 +53,14 @@ fun HomeScreen(
         contentPadding = PaddingValues(bottom = 16.dp)
     ) {
         item { WelcomeHeader() }
-        item { SearchBar(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) }
+        item { // MODIFIKASI: Bungkus SearchBar dengan Box yang bisa diklik
+            Box(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .clickable { navController.navigate(Screen.Search.route) }
+            ) {
+                SearchBar(enabled = false) // enabled = false agar tidak fokus
+            } }
         item { PromoBanners(banners = uiState.promoBanners, isLoading = uiState.isLoading) }
         item {
             SectionHeader(title = "Kategori")
@@ -100,7 +108,7 @@ fun WelcomeHeader() {
 }
 
 @Composable
-fun SearchBar(modifier: Modifier = Modifier) {
+fun SearchBar(modifier: Modifier = Modifier, enabled: Boolean = true) {
     TextField(
         value = "",
         onValueChange = {},
@@ -113,7 +121,8 @@ fun SearchBar(modifier: Modifier = Modifier) {
             unfocusedIndicatorColor = Color.Transparent,
             disabledIndicatorColor = Color.Transparent
         ),
-        readOnly = true
+        readOnly = true,
+        enabled = enabled
     )
 }
 

@@ -10,4 +10,5 @@ interface HomeRepository {
     suspend fun getRecommendedItems(): List<MenuItem>
     suspend fun getMenuItemsByCategory(categoryId: String): List<MenuItem>
     suspend fun getMenuItemById(menuItemId: String): MenuItem?
+    suspend fun searchMenuItems(query: String): List<MenuItem>
 }

@@ -76,4 +76,26 @@ class HomeRepositoryImpl @Inject constructor(
             null
         }
     }
+
+    override suspend fun searchMenuItems(query: String): List<MenuItem> {
+        if (query.isBlank()) {
+            return emptyList()
+        }
+        return try {
+            // Ambil semua item menu. Untuk aplikasi skala besar, pertimbangkan
+            // layanan pencarian pihak ketiga seperti Algolia atau Elasticsearch.
+            val allItems = firestore.collection("menuItems")
+                .get()
+                .await()
+                .toObjects(MenuItem::class.java)
+
+            // Filter di sisi klien dengan case-insensitive
+            allItems.filter { menuItem ->
+                menuItem.name.contains(query, ignoreCase = true)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emptyList()
+        }
+    }
 }

@@ -29,7 +29,9 @@ fun AppNavigation(navController: NavHostController) {
             HomeScreen(navController = navController)
         }
 
-        composable(Screen.Search.route) { SearchScreen() }
+        composable(Screen.Search.route) {
+            SearchScreen(navController = navController)
+        }
 
         composable(Screen.Orders.route) { OrdersScreen() }
 
