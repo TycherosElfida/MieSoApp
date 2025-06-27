@@ -13,10 +13,6 @@ class UserRepositoryImpl @Inject constructor(
     private val firestore: FirebaseFirestore
 ) : UserRepository {
 
-    // For this prototype, we'll use a hardcoded user ID.
-    // In a real app, you would get this from FirebaseAuth.
-    private val prototypeUserId = "Eric_lil_KT"
-
     override fun getUserAddresses(userId: String): Flow<List<UserAddress>> {
         return firestore.collection("users").document(userId).collection("addresses")
             .snapshots() // Use snapshots() for real-time updates

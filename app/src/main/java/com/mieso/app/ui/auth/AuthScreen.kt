@@ -93,7 +93,6 @@ fun AuthScreen(
                 modifier = Modifier.padding(bottom = 32.dp)
             )
 
-            // The main form content with animated switching between Sign In and Sign Up.
             Surface(
                 shape = RoundedCornerShape(16.dp),
                 shadowElevation = 8.dp,
@@ -214,6 +213,7 @@ private fun EmailAuthForm(
             }
         }
 
+        @Suppress("Deprecation")
         ClickableText(
             text = annotatedString,
             onClick = { onModeToggled() }
