@@ -37,7 +37,7 @@ fun AppNavigation(navController: NavHostController) {
 
         composable(Screen.Promo.route) { PromoScreen() }
 
-        composable(Screen.Profile.route) { ProfileScreen() }
+        composable(Screen.Profile.route) { ProfileScreen(navController = navController) }
 
         composable(
             route = Screen.Menu.route,

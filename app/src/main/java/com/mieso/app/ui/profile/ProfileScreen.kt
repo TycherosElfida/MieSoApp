@@ -1,10 +1,14 @@
 package com.mieso.app.ui.profile
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -12,17 +16,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import coil3.compose.AsyncImage
+import com.mieso.app.data.auth.UserData
+import com.mieso.app.ui.navigation.Screen
 import com.mieso.app.ui.profile.viewmodel.ProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
+    navController: NavController,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -32,42 +40,72 @@ fun ProfileScreen(
             TopAppBar(title = { Text("Profil Saya") })
         }
     ) { paddingValues ->
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            when {
-                uiState.isLoading -> {
-                    CircularProgressIndicator()
-                }
-                uiState.userData != null -> {
-                    val userData = uiState.userData!!
-                    Spacer(modifier = Modifier.height(32.dp))
-                    AsyncImage(
-                        model = userData.profilePictureUrl,
-                        contentDescription = "Profile Picture",
-                        contentScale = ContentScale.Crop,
+            item {
+                if (uiState.isLoading) {
+                    Box(
                         modifier = Modifier
-                            .size(120.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                            .fillMaxWidth()
+                            .height(100.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                } else if (uiState.userData != null) {
+                    ProfileHeader(userData = uiState.userData!!)
+                }
+            }
+
+            item { HorizontalDivider(thickness = 8.dp, color = MaterialTheme.colorScheme.surfaceVariant) }
+
+            // Menu Akun
+            item {
+                ProfileMenuSection(title = "Akun Saya") {
+                    ProfileMenuItem(
+                        text = "Alamat Tersimpan",
+                        icon = Icons.Outlined.LocationOn,
+                        onClick = { navController.navigate(Screen.DeliveryDetails.route) }
                     )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = userData.username ?: "User",
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold
+                    ProfileMenuItem(
+                        text = "Transaksi Saya",
+                        icon = Icons.Outlined.Discount,
+                        onClick = { navController.navigate(Screen.Orders.route) }
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = userData.userId,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                }
+            }
+
+            item { HorizontalDivider(thickness = 8.dp, color = MaterialTheme.colorScheme.surfaceVariant) }
+
+            // Menu Informasi
+            item {
+                ProfileMenuSection(title = "Informasi & Bantuan") {
+                    ProfileMenuItem(
+                        text = "Pusat Bantuan",
+                        icon = Icons.Outlined.HelpOutline,
+                        onClick = { /* TODO: Navigasi ke Pusat Bantuan */ }
                     )
-                    Spacer(modifier = Modifier.weight(1f))
+                    ProfileMenuItem(
+                        text = "Syarat & Ketentuan",
+                        icon = Icons.Outlined.Description,
+                        onClick = { /* TODO: Navigasi ke S&K */ }
+                    )
+                    ProfileMenuItem(
+                        text = "Kebijakan Privasi",
+                        icon = Icons.Outlined.Shield,
+                        onClick = { /* TODO: Navigasi ke Kebijakan Privasi */ }
+                    )
+                }
+            }
+
+            item { Spacer(modifier = Modifier.height(24.dp)) }
+
+            // Tombol Keluar
+            item {
+                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
                     Button(
                         onClick = viewModel::signOut,
                         modifier = Modifier
@@ -80,20 +118,105 @@ fun ProfileScreen(
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.Logout,
-                            contentDescription = "Sign Out",
+                            contentDescription = "Keluar",
                             modifier = Modifier.padding(end = 8.dp)
                         )
-                        Text("Sign Out")
+                        Text("Keluar")
                     }
                 }
-                else -> {
-                    Text(
-                        text = "Could not load user data.",
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
             }
+
+            item { Spacer(modifier = Modifier.height(16.dp)) }
         }
     }
+}
+
+@Composable
+private fun ProfileHeader(userData: UserData) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        AsyncImage(
+            model = userData.profilePictureUrl,
+            contentDescription = "Foto Profil",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(64.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+        )
+        Spacer(Modifier.width(16.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = userData.username ?: "Pengguna MieSo",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+            // Tampilkan Email
+            userData.email?.let { email ->
+                Text(
+                    text = email,
+                    // UBAH BARIS INI: Samakan style dengan username
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            // Tampilkan ID Pengguna
+            Text(
+                text = "ID: ${userData.userId}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+            )
+        }
+    }
+}
+
+
+@Composable
+private fun ProfileMenuSection(
+    title: String,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp)
+        )
+        content()
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ProfileMenuItem(
+    text: String,
+    icon: ImageVector,
+    onClick: () -> Unit
+) {
+    ListItem(
+        modifier = Modifier.clickable(onClick = onClick),
+        headlineContent = { Text(text, style = MaterialTheme.typography.bodyLarge) },
+        leadingContent = {
+            Icon(
+                imageVector = icon,
+                contentDescription = text,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        },
+        trailingContent = {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = null
+            )
+        },
+        colors = ListItemDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
+    )
+    HorizontalDivider(modifier = Modifier.padding(start = 16.dp, end = 16.dp))
 }

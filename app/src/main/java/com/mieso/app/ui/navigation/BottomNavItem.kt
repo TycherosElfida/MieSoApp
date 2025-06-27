@@ -32,9 +32,9 @@ val bottomNavItems = listOf(
         screen = Screen.Cart
     ),
     BottomNavItem(
-        label = "Promo",
+        label = "Orders",
         icon = Icons.Outlined.Discount,
-        screen = Screen.Promo
+        screen = Screen.Orders
     ),
     BottomNavItem(
         label = "Profile",

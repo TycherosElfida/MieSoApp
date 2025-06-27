@@ -33,7 +33,8 @@ class AuthRepositoryImpl @Inject constructor(
                 UserData(
                     userId = user.uid,
                     username = user.displayName,
-                    profilePictureUrl = user.photoUrl?.toString()
+                    profilePictureUrl = user.photoUrl?.toString(),
+                    email = user.email // TAMBAHKAN INI
                 )
             )
         } catch (e: Exception) {
@@ -50,7 +51,8 @@ class AuthRepositoryImpl @Inject constructor(
                 UserData(
                     userId = user.uid,
                     username = user.displayName, // Will be null initially
-                    profilePictureUrl = user.photoUrl?.toString()
+                    profilePictureUrl = user.photoUrl?.toString(),
+                    email = user.email // TAMBAHKAN INI
                 )
             )
         } catch (e: Exception) {
@@ -67,7 +69,8 @@ class AuthRepositoryImpl @Inject constructor(
                 UserData(
                     userId = user.uid,
                     username = user.displayName,
-                    profilePictureUrl = user.photoUrl?.toString()
+                    profilePictureUrl = user.photoUrl?.toString(),
+                    email = user.email // TAMBAHKAN INI
                 )
             )
         } catch (e: Exception) {

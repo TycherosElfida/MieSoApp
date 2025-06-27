@@ -29,7 +29,8 @@ class ProfileViewModel @Inject constructor(
                     UserData(
                         userId = it.uid,
                         username = it.displayName,
-                        profilePictureUrl = it.photoUrl?.toString()
+                        profilePictureUrl = it.photoUrl?.toString(),
+                        email = it.email // TAMBAHKAN INI
                     )
                 }
                 _uiState.update { it.copy(isLoading = false, userData = userData) }
