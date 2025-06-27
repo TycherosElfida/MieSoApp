@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.mieso.app.ui.auth
 
 import android.widget.Toast
@@ -213,7 +215,6 @@ private fun EmailAuthForm(
             }
         }
 
-        @Suppress("Deprecation")
         ClickableText(
             text = annotatedString,
             onClick = { onModeToggled() }

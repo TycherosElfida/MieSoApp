@@ -1,4 +1,4 @@
-@file:Suppress("UnstableApiUsage")
+@file:Suppress("UnstableApiUsage", "DEPRECATION")
 
 plugins {
     alias(libs.plugins.android.application)
@@ -11,7 +11,7 @@ plugins {
 
 android {
     namespace = "com.mieso.app"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.mieso.app"

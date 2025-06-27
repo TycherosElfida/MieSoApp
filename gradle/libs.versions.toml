@@ -3,7 +3,7 @@
 # toolchain
 agp                     = "8.11.0"
 
-kotlin                  = "2.1.21"
+kotlin                  = "2.2.0"
 kotlinxCoroutinesPlayServices = "1.10.2"
 ksp                     = "2.1.21-2.0.1"
 
@@ -12,21 +12,21 @@ coroutines              = "1.10.2"
 hiltAndroid             = "2.56.2"
 navigation              = "2.9.0"
 hiltNavCompose          = "1.2.0"
-playServicesLocation = "21.3.0"
+playServicesLocation    = "21.3.0"
 room                    = "2.7.2"
 composeBom              = "2025.06.01"
-firebaseBom             = "33.15.0"
+firebaseBom             = "33.16.0"
 coilCompose             = "3.2.0"
 coilNetworkOkhttp       = "3.2.0"
 dataStore               = "1.1.7"
 coreKtx                 = "1.16.0"
 lifecycleRuntimeKtx     = "2.9.1"
 activityCompose         = "1.10.1"
-googleGms               = "4.4.2"
+googleGms               = "4.4.3"
 junit                   = "4.13.2"
 junitVersion            = "1.2.1"
 espressoCore            = "3.6.1"
-playServicesAuth = "21.3.0"
+playServicesAuth        = "21.3.0"
 
 # ─────────── libraries ──────────
 [libraries]
