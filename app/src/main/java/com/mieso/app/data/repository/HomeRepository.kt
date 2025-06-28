@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface HomeRepository {
     suspend fun getPromoBanners(): List<PromoBanner>
-    // fun getCategories(): Flow<List<FoodCategory>>
     suspend fun getCategories(): List<FoodCategory>
     suspend fun getRecommendedItems(): List<MenuItem>
     suspend fun getMenuItemsByCategory(categoryId: String): List<MenuItem>

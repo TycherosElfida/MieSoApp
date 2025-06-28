@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
-import com.mieso.app.data.auth.UserData
 import com.mieso.app.ui.navigation.Screen
 import com.mieso.app.ui.profile.viewmodel.ProfileViewModel
 
@@ -34,7 +33,6 @@ fun ProfileScreen(
     navController: NavController,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsState()
     val user by viewModel.user.collectAsState()
 
     Scaffold(
@@ -43,22 +41,18 @@ fun ProfileScreen(
         }
     ) { paddingValues ->
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
+            modifier = Modifier.fillMaxSize().padding(paddingValues)
         ) {
             item {
-                if (uiState.isLoading) {
+                if (user == null) {
                     Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(100.dp),
+                        modifier = Modifier.fillMaxWidth().height(100.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator()
                     }
-                } else if (uiState.userData != null) {
-                    ProfileHeader(userData = uiState.userData!!)
+                } else {
+                    ProfileHeader(userData = user!!) // Pass the User object
                 }
             }
 
@@ -157,11 +151,9 @@ fun ProfileScreen(
 }
 
 @Composable
-private fun ProfileHeader(userData: UserData) {
+private fun ProfileHeader(userData: com.mieso.app.data.model.User) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
+        modifier = Modifier.fillMaxWidth().padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         AsyncImage(
@@ -181,15 +173,10 @@ private fun ProfileHeader(userData: UserData) {
                 fontWeight = FontWeight.Bold
             )
             userData.email?.let { email ->
-                Text(
-                    text = email,
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                Text(text = email)
             }
-            // Tampilkan ID Pengguna
             Text(
-                text = "ID: ${userData.userId}",
+                text = "ID: ${userData.id}",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
             )
