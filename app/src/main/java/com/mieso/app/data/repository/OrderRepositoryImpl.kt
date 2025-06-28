@@ -14,27 +14,26 @@ class OrderRepositoryImpl @Inject constructor(
 ) : OrderRepository {
     override suspend fun placeOrder(order: Order): Result<Unit> {
         return try {
-            // Adds the order object to the "orders" collection in Firestore
+            // The `order` object now reliably contains the correct `userId`.
+            // The security rule `allow create: if request.auth.uid != null;` permits this.
+            // Firestore will automatically handle the server-side timestamp for `createdAt`.
             firestore.collection("orders").add(order).await()
             Result.success(Unit)
         } catch (e: Exception) {
-            // In case of an error (e.g., network issue), return a failure result
             e.printStackTrace()
             Result.failure(e)
         }
     }
 
     override fun getUserOrders(userId: String): Flow<List<Order>> {
-        // Query the 'orders' collection...
+        // This query correctly filters orders based on the `userId` field.
+        // The security rule `allow read: if request.auth.uid == resource.data.userId` ensures
+        // users can only read their own orders.
         return firestore.collection("orders")
-            // ...for documents where the 'userId' field matches the current user's ID...
             .whereEqualTo("userId", userId)
-            // ...and sort them by creation date, with the newest orders first.
             .orderBy("createdAt", Query.Direction.DESCENDING)
-            // .snapshots() provides a Flow that emits updates in real-time.
             .snapshots()
             .map { snapshot ->
-                // Convert the query snapshot into a list of Order objects.
                 snapshot.toObjects(Order::class.java)
             }
     }

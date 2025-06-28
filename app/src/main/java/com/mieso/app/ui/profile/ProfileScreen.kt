@@ -1,12 +1,4 @@
-// File: app/src/main/java/com/mieso/app/ui/profile/ProfileScreen.kt
-
 package com.mieso.app.ui.profile
-
-// --- TAMBAHKAN IMPORT INI ---
-import android.app.Activity
-import android.content.Intent
-import androidx.compose.ui.platform.LocalContext
-// --- AKHIR TAMBAHAN IMPORT ---
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,7 +11,9 @@ import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,7 +24,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
-import com.mieso.app.MainActivity
 import com.mieso.app.data.auth.UserData
 import com.mieso.app.ui.navigation.Screen
 import com.mieso.app.ui.profile.viewmodel.ProfileViewModel
@@ -43,31 +36,6 @@ fun ProfileScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val user by viewModel.user.collectAsState()
-
-    var showLogoutDialog by remember { mutableStateOf(false) }
-    val context = LocalContext.current // Dapatkan konteks di sini
-
-    if (showLogoutDialog) {
-        LogoutConfirmationDialog(
-            onConfirmLogout = {
-                showLogoutDialog = false
-                viewModel.signOut()
-
-                // --- PERUBAHAN UTAMA DI SINI ---
-                // Buat Intent untuk memulai ulang MainActivity
-                val intent = Intent(context, MainActivity::class.java)
-                // Flag ini akan membersihkan semua activity sebelumnya dari stack
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-                context.startActivity(intent)
-                // Selesaikan activity saat ini
-                (context as? Activity)?.finish()
-                // --- AKHIR PERUBAHAN UTAMA ---
-            },
-            onDismiss = {
-                showLogoutDialog = false
-            }
-        )
-    }
 
     Scaffold(
         topBar = {
@@ -112,20 +80,30 @@ fun ProfileScreen(
                 }
             }
 
+            item { HorizontalDivider(thickness = 8.dp, color = MaterialTheme.colorScheme.surfaceVariant) }
+
+            // Admin Menu Button
             if (user?.role == "admin") {
                 item {
-                    HorizontalDivider(thickness = 8.dp, color = MaterialTheme.colorScheme.surfaceVariant)
-                    ProfileMenuSection(title = "Panel Admin") {
+                    ProfileMenuSection(title = "Admin") {
                         ProfileMenuItem(
-                            text = "Admin Dashboard",
-                            icon = Icons.Outlined.AdminPanelSettings,
-                            onClick = { navController.navigate(Screen.AdminDashboard.route) }
+                            text = "Manage Menu",
+                            icon = Icons.Outlined.RestaurantMenu,
+                            onClick = { navController.navigate(Screen.AdminMenu.route) }
+                        )
+                        ProfileMenuItem(
+                            text = "Manage Categories",
+                            icon = Icons.Outlined.Category,
+                            onClick = { navController.navigate(Screen.AdminCategories.route) }
+                        )
+                        ProfileMenuItem(
+                            text = "Manage Promo Banners",
+                            icon = Icons.Outlined.Campaign,
+                            onClick = { navController.navigate(Screen.AdminPromoBanners.route) }
                         )
                     }
                 }
             }
-
-            item { HorizontalDivider(thickness = 8.dp, color = MaterialTheme.colorScheme.surfaceVariant) }
 
             // Menu Informasi
             item {
@@ -154,7 +132,7 @@ fun ProfileScreen(
             item {
                 Box(modifier = Modifier.padding(horizontal = 16.dp)) {
                     Button(
-                        onClick = { showLogoutDialog = true },
+                        onClick = viewModel::signOut,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp),
@@ -176,37 +154,6 @@ fun ProfileScreen(
             item { Spacer(modifier = Modifier.height(16.dp)) }
         }
     }
-}
-
-@Composable
-private fun LogoutConfirmationDialog(
-    onConfirmLogout: () -> Unit,
-    onDismiss: () -> Unit
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text(text = "Konfirmasi Keluar")
-        },
-        text = {
-            Text(text = "Apakah Anda yakin ingin keluar dari akun Anda?")
-        },
-        confirmButton = {
-            Button(
-                onClick = onConfirmLogout,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.error
-                )
-            ) {
-                Text("Keluar")
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Batal")
-            }
-        }
-    )
 }
 
 @Composable
@@ -240,6 +187,7 @@ private fun ProfileHeader(userData: UserData) {
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
+            // Tampilkan ID Pengguna
             Text(
                 text = "ID: ${userData.userId}",
                 style = MaterialTheme.typography.bodySmall,

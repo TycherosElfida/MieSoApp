@@ -5,6 +5,7 @@ import com.google.firebase.firestore.snapshots
 import com.mieso.app.data.model.UserAddress
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -15,7 +16,7 @@ class UserRepositoryImpl @Inject constructor(
 
     override fun getUserAddresses(userId: String): Flow<List<UserAddress>> {
         return firestore.collection("users").document(userId).collection("addresses")
-            .snapshots() // Use snapshots() for real-time updates
+            .snapshots()
             .map { snapshot ->
                 snapshot.toObjects(UserAddress::class.java)
             }
@@ -23,6 +24,6 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun addAddress(userId: String, address: UserAddress) {
         firestore.collection("users").document(userId).collection("addresses")
-            .add(address)
+            .add(address).await() // Using .add() is correct for creating a new document with an auto-generated ID
     }
 }

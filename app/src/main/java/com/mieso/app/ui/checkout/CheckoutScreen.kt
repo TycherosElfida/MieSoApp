@@ -75,13 +75,12 @@ fun CheckoutScreen(
 
             Button(
                 onClick = {
-                    // MODIFIED: Added navigation logic based on selection
                     when (uiState.selectedServiceType) {
                         ServiceType.DELIVERY -> {
                             navController.navigate(Screen.DeliveryDetails.route)
                         }
                         ServiceType.DINE_IN -> {
-                            //bloman
+                            //belom-an
                         }
                         ServiceType.TAKE_AWAY -> {
                             navController.navigate(Screen.Payment.route)
