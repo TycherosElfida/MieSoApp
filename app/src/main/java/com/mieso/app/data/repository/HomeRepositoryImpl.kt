@@ -2,9 +2,12 @@ package com.mieso.app.data.repository
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.snapshots
 import com.mieso.app.data.model.FoodCategory
 import com.mieso.app.data.model.MenuItem
 import com.mieso.app.data.model.PromoBanner
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
@@ -96,6 +99,39 @@ class HomeRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             e.printStackTrace()
             emptyList()
+        }
+    }
+
+    override fun getAllMenuItemsStream(): Flow<List<MenuItem>> {
+        return firestore.collection("menuItems")
+            .orderBy("name")
+            .snapshots()
+            .map { snapshot ->
+                snapshot.toObjects(MenuItem::class.java)
+            }
+    }
+
+    override suspend fun deleteMenuItem(itemId: String) {
+        try {
+            firestore.collection("menuItems").document(itemId).delete().await()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    override suspend fun addMenuItem(menuItem: MenuItem) {
+        try {
+            firestore.collection("menuItems").add(menuItem).await()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    override suspend fun updateMenuItem(menuItem: MenuItem) {
+        try {
+            firestore.collection("menuItems").document(menuItem.id).set(menuItem).await()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 }

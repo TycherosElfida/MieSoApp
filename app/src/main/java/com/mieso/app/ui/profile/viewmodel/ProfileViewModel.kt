@@ -2,23 +2,37 @@ package com.mieso.app.ui.profile.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.snapshots
 import com.mieso.app.data.auth.UserData
+import com.mieso.app.data.model.User
 import com.mieso.app.data.repository.AuthRepository
 import com.mieso.app.ui.profile.state.ProfileUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val firestore: FirebaseFirestore
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfileUiState())
     val uiState = _uiState.asStateFlow()
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val user: StateFlow<User?> = authRepository.getAuthState().flatMapLatest { firebaseUser ->
+        if (firebaseUser != null) {
+            firestore.collection("users").document(firebaseUser.uid).snapshots().map { snapshot ->
+                snapshot.toObject(User::class.java)
+            }
+        } else {
+            flowOf(null)
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     init {
         // Observe the authentication state from the repository.
@@ -30,7 +44,7 @@ class ProfileViewModel @Inject constructor(
                         userId = it.uid,
                         username = it.displayName,
                         profilePictureUrl = it.photoUrl?.toString(),
-                        email = it.email // TAMBAHKAN INI
+                        email = it.email
                     )
                 }
                 _uiState.update { it.copy(isLoading = false, userData = userData) }

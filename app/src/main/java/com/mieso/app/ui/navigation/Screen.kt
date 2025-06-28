@@ -42,6 +42,20 @@ sealed class Screen(val route: String) {
     object ManageAddresses : Screen("manage_addresses_screen")
 
     object HelpCenter : Screen("help_center_screen")
+
     object TermsAndConditions : Screen("terms_and_conditions_screen")
+
     object PrivacyPolicy : Screen("privacy_policy_screen")
+
+    object AdminMenu : Screen("admin_menu_screen")
+
+    object AddEditMenuItem : Screen("add_edit_menu_item_screen?menuItemId={menuItemId}") {
+        fun createRoute(menuItemId: String? = null): String {
+            return if (menuItemId != null) {
+                "add_edit_menu_item_screen?menuItemId=$menuItemId"
+            } else {
+                "add_edit_menu_item_screen"
+            }
+        }
+    }
 }

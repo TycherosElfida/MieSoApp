@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -34,6 +35,7 @@ fun ProfileScreen(
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val user by viewModel.user.collectAsState()
 
     Scaffold(
         topBar = {
@@ -85,7 +87,7 @@ fun ProfileScreen(
                 ProfileMenuSection(title = "Informasi & Bantuan") {
                     ProfileMenuItem(
                         text = "Pusat Bantuan",
-                        icon = Icons.Outlined.HelpOutline,
+                        icon = Icons.AutoMirrored.Outlined.HelpOutline,
                         onClick = { navController.navigate(Screen.HelpCenter.route) }
                     )
                     ProfileMenuItem(
@@ -98,6 +100,19 @@ fun ProfileScreen(
                         icon = Icons.Outlined.Shield,
                         onClick = { navController.navigate(Screen.PrivacyPolicy.route) }
                     )
+                }
+            }
+
+            // Admin Menu Button
+            if (user?.role == "admin") {
+                item {
+                    ProfileMenuSection(title = "Admin") {
+                        ProfileMenuItem(
+                            text = "Manage Menu",
+                            icon = Icons.Outlined.RestaurantMenu,
+                            onClick = { navController.navigate(Screen.AdminMenu.route) }
+                        )
+                    }
                 }
             }
 

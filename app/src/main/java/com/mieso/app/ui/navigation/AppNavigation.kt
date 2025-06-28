@@ -6,6 +6,8 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.mieso.app.ui.admin.AddEditMenuItemScreen
+import com.mieso.app.ui.admin.AdminMenuScreen
 import com.mieso.app.ui.cart.CartScreen
 import com.mieso.app.ui.checkout.AddAddressScreen
 import com.mieso.app.ui.checkout.CheckoutScreen
@@ -91,5 +93,18 @@ fun AppNavigation(navController: NavHostController) {
             PrivacyPolicyScreen(navController = navController)
         }
 
+        composable(Screen.AdminMenu.route) {
+            AdminMenuScreen(navController)
+        }
+
+        composable(
+            route = Screen.AddEditMenuItem.route,
+            arguments = listOf(navArgument("menuItemId") {
+                type = NavType.StringType
+                nullable = true
+            })
+        ) {
+            AddEditMenuItemScreen(navController = navController)
+        }
     }
 }
