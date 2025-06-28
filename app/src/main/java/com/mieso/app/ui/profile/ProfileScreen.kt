@@ -82,6 +82,29 @@ fun ProfileScreen(
 
             item { HorizontalDivider(thickness = 8.dp, color = MaterialTheme.colorScheme.surfaceVariant) }
 
+            // Admin Menu Button
+            if (user?.role == "admin") {
+                item {
+                    ProfileMenuSection(title = "Admin") {
+                        ProfileMenuItem(
+                            text = "Manage Menu",
+                            icon = Icons.Outlined.RestaurantMenu,
+                            onClick = { navController.navigate(Screen.AdminMenu.route) }
+                        )
+                        ProfileMenuItem(
+                            text = "Manage Categories",
+                            icon = Icons.Outlined.Category,
+                            onClick = { navController.navigate(Screen.AdminCategories.route) }
+                        )
+                        ProfileMenuItem(
+                            text = "Manage Promo Banners",
+                            icon = Icons.Outlined.Campaign,
+                            onClick = { navController.navigate(Screen.AdminPromoBanners.route) }
+                        )
+                    }
+                }
+            }
+
             // Menu Informasi
             item {
                 ProfileMenuSection(title = "Informasi & Bantuan") {
@@ -100,19 +123,6 @@ fun ProfileScreen(
                         icon = Icons.Outlined.Shield,
                         onClick = { navController.navigate(Screen.PrivacyPolicy.route) }
                     )
-                }
-            }
-
-            // Admin Menu Button
-            if (user?.role == "admin") {
-                item {
-                    ProfileMenuSection(title = "Admin") {
-                        ProfileMenuItem(
-                            text = "Manage Menu",
-                            icon = Icons.Outlined.RestaurantMenu,
-                            onClick = { navController.navigate(Screen.AdminMenu.route) }
-                        )
-                    }
                 }
             }
 
@@ -165,16 +175,14 @@ private fun ProfileHeader(userData: UserData) {
         )
         Spacer(Modifier.width(16.dp))
         Column(modifier = Modifier.weight(1f)) {
-//            Text(
-//                text = userData.username ?: "Pengguna MieSo",
-//                style = MaterialTheme.typography.titleLarge,
-//                fontWeight = FontWeight.Bold
-//            )
-            // Tampilkan Email
+            Text(
+                text = userData.username ?: "Pengguna MieSo",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
             userData.email?.let { email ->
                 Text(
                     text = email,
-                    // UBAH BARIS INI: Samakan style dengan username
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

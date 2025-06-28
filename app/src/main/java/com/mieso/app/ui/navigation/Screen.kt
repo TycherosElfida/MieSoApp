@@ -58,4 +58,17 @@ sealed class Screen(val route: String) {
             }
         }
     }
+    object AdminCategories : Screen("admin_categories_screen")
+
+    object AdminPromoBanners : Screen("admin_promo_banners_screen")
+
+    object AddEditPromoBanner : Screen("add_edit_promo_banner_screen?bannerId={bannerId}") {
+        fun createRoute(bannerId: String? = null): String {
+            return if (bannerId != null) {
+                "add_edit_promo_banner_screen?bannerId=$bannerId"
+            } else {
+                "add_edit_promo_banner_screen"
+            }
+        }
+    }
 }

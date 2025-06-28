@@ -17,4 +17,12 @@ interface HomeRepository {
     suspend fun deleteMenuItem(itemId: String)
     suspend fun addMenuItem(menuItem: MenuItem)
     suspend fun updateMenuItem(menuItem: MenuItem)
+    suspend fun addCategory(category: FoodCategory)
+    suspend fun updateCategory(category: FoodCategory)
+    suspend fun deleteCategory(categoryId: String)
+    fun getPromoBannersStream(): Flow<List<PromoBanner>>
+    suspend fun getPromoBannerById(bannerId: String): PromoBanner?
+    suspend fun addPromoBanner(banner: PromoBanner)
+    suspend fun updatePromoBanner(banner: PromoBanner)
+    suspend fun deletePromoBanner(bannerId: String)
 }

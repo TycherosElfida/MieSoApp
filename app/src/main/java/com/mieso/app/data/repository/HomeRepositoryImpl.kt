@@ -134,4 +134,70 @@ class HomeRepositoryImpl @Inject constructor(
             e.printStackTrace()
         }
     }
+
+    override suspend fun addCategory(category: FoodCategory) {
+        try {
+            firestore.collection("categories").add(category).await()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    override suspend fun updateCategory(category: FoodCategory) {
+        try {
+            firestore.collection("categories").document(category.id).set(category).await()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    override suspend fun deleteCategory(categoryId: String) {
+        try {
+            firestore.collection("categories").document(categoryId).delete().await()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    override fun getPromoBannersStream(): Flow<List<PromoBanner>> {
+        return firestore.collection("promoBanners")
+            .orderBy("order")
+            .snapshots()
+            .map { snapshot -> snapshot.toObjects(PromoBanner::class.java) }
+    }
+
+    // v-- ADD THIS FUNCTION IMPLEMENTATION --v
+    override suspend fun getPromoBannerById(bannerId: String): PromoBanner? {
+        return try {
+            firestore.collection("promoBanners").document(bannerId).get().await()
+                .toObject(PromoBanner::class.java)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    override suspend fun addPromoBanner(banner: PromoBanner) {
+        try {
+            firestore.collection("promoBanners").document().set(banner).await()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    override suspend fun updatePromoBanner(banner: PromoBanner) {
+        try {
+            firestore.collection("promoBanners").document(banner.id).set(banner).await()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    override suspend fun deletePromoBanner(bannerId: String) {
+        try {
+            firestore.collection("promoBanners").document(bannerId).delete().await()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 }
