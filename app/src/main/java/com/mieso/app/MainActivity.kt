@@ -1,3 +1,5 @@
+// File: app/src/main/java/com/mieso/app/MainActivity.kt
+
 package com.mieso.app
 
 import android.os.Bundle
@@ -40,18 +42,25 @@ class MainActivity : ComponentActivity() {
                     composable("auth_gate") {
                         val authState by authRepository.getAuthState().collectAsState(initial = null)
 
+                        // LaunchedEffect ini adalah kunci dari alur navigasi kita.
+                        // Ia akan berjalan setiap kali authState berubah.
                         LaunchedEffect(authState) {
                             if (authState != null) {
+                                // Jika ada pengguna yang login (authState bukan null),
+                                // navigasi ke MainScreen.
                                 navController.navigate(Screen.Main.route) {
                                     popUpTo("auth_gate") { inclusive = true }
                                 }
                             } else {
+                                // Jika tidak ada pengguna yang login (authState adalah null),
+                                // navigasi ke AuthScreen (Login.route).
                                 navController.navigate(Screen.Login.route) {
                                     popUpTo("auth_gate") { inclusive = true }
                                 }
                             }
                         }
 
+                        // Menampilkan indikator loading selama proses pengecekan status.
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             CircularProgressIndicator()
                         }
