@@ -6,6 +6,11 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.mieso.app.ui.admin.AddEditMenuItemScreen
+import com.mieso.app.ui.admin.AddEditPromoBannerScreen
+import com.mieso.app.ui.admin.AdminCategoriesScreen
+import com.mieso.app.ui.admin.AdminMenuScreen
+import com.mieso.app.ui.admin.AdminPromoBannersScreen
 import com.mieso.app.ui.cart.CartScreen
 import com.mieso.app.ui.checkout.AddAddressScreen
 import com.mieso.app.ui.checkout.CheckoutScreen
@@ -91,5 +96,36 @@ fun AppNavigation(navController: NavHostController) {
             PrivacyPolicyScreen(navController = navController)
         }
 
+        composable(Screen.AdminMenu.route) {
+            AdminMenuScreen(navController)
+        }
+
+        composable(
+            route = Screen.AddEditMenuItem.route,
+            arguments = listOf(navArgument("menuItemId") {
+                type = NavType.StringType
+                nullable = true
+            })
+        ) {
+            AddEditMenuItemScreen(navController = navController)
+        }
+
+        composable(Screen.AdminCategories.route) {
+            AdminCategoriesScreen(navController = navController)
+        }
+
+        composable(Screen.AdminPromoBanners.route) {
+            AdminPromoBannersScreen(navController = navController)
+        }
+
+        composable(
+            route = Screen.AddEditPromoBanner.route,
+            arguments = listOf(navArgument("bannerId") {
+                type = NavType.StringType
+                nullable = true
+            })
+        ) {
+            AddEditPromoBannerScreen(navController = navController)
+        }
     }
 }

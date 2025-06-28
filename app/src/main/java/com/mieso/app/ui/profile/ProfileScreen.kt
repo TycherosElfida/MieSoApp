@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -34,6 +35,7 @@ fun ProfileScreen(
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val user by viewModel.user.collectAsState()
 
     Scaffold(
         topBar = {
@@ -80,12 +82,35 @@ fun ProfileScreen(
 
             item { HorizontalDivider(thickness = 8.dp, color = MaterialTheme.colorScheme.surfaceVariant) }
 
+            // Admin Menu Button
+            if (user?.role == "admin") {
+                item {
+                    ProfileMenuSection(title = "Admin") {
+                        ProfileMenuItem(
+                            text = "Manage Menu",
+                            icon = Icons.Outlined.RestaurantMenu,
+                            onClick = { navController.navigate(Screen.AdminMenu.route) }
+                        )
+                        ProfileMenuItem(
+                            text = "Manage Categories",
+                            icon = Icons.Outlined.Category,
+                            onClick = { navController.navigate(Screen.AdminCategories.route) }
+                        )
+                        ProfileMenuItem(
+                            text = "Manage Promo Banners",
+                            icon = Icons.Outlined.Campaign,
+                            onClick = { navController.navigate(Screen.AdminPromoBanners.route) }
+                        )
+                    }
+                }
+            }
+
             // Menu Informasi
             item {
                 ProfileMenuSection(title = "Informasi & Bantuan") {
                     ProfileMenuItem(
                         text = "Pusat Bantuan",
-                        icon = Icons.Outlined.HelpOutline,
+                        icon = Icons.AutoMirrored.Outlined.HelpOutline,
                         onClick = { navController.navigate(Screen.HelpCenter.route) }
                     )
                     ProfileMenuItem(
@@ -150,16 +175,14 @@ private fun ProfileHeader(userData: UserData) {
         )
         Spacer(Modifier.width(16.dp))
         Column(modifier = Modifier.weight(1f)) {
-//            Text(
-//                text = userData.username ?: "Pengguna MieSo",
-//                style = MaterialTheme.typography.titleLarge,
-//                fontWeight = FontWeight.Bold
-//            )
-            // Tampilkan Email
+            Text(
+                text = userData.username ?: "Pengguna MieSo",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
             userData.email?.let { email ->
                 Text(
                     text = email,
-                    // UBAH BARIS INI: Samakan style dengan username
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

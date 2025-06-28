@@ -2,9 +2,12 @@ package com.mieso.app.data.repository
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.snapshots
 import com.mieso.app.data.model.FoodCategory
 import com.mieso.app.data.model.MenuItem
 import com.mieso.app.data.model.PromoBanner
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
@@ -109,6 +112,105 @@ class HomeRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             e.printStackTrace()
             emptyList()
+        }
+    }
+
+    override fun getAllMenuItemsStream(): Flow<List<MenuItem>> {
+        return firestore.collection("menuItems")
+            .orderBy("name")
+            .snapshots()
+            .map { snapshot ->
+                snapshot.toObjects(MenuItem::class.java)
+            }
+    }
+
+    override suspend fun deleteMenuItem(itemId: String) {
+        try {
+            firestore.collection("menuItems").document(itemId).delete().await()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    override suspend fun addMenuItem(menuItem: MenuItem) {
+        try {
+            firestore.collection("menuItems").add(menuItem).await()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    override suspend fun updateMenuItem(menuItem: MenuItem) {
+        try {
+            firestore.collection("menuItems").document(menuItem.id).set(menuItem).await()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    override suspend fun addCategory(category: FoodCategory) {
+        try {
+            firestore.collection("categories").add(category).await()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    override suspend fun updateCategory(category: FoodCategory) {
+        try {
+            firestore.collection("categories").document(category.id).set(category).await()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    override suspend fun deleteCategory(categoryId: String) {
+        try {
+            firestore.collection("categories").document(categoryId).delete().await()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    override fun getPromoBannersStream(): Flow<List<PromoBanner>> {
+        return firestore.collection("promoBanners")
+            .orderBy("order")
+            .snapshots()
+            .map { snapshot -> snapshot.toObjects(PromoBanner::class.java) }
+    }
+
+    // v-- ADD THIS FUNCTION IMPLEMENTATION --v
+    override suspend fun getPromoBannerById(bannerId: String): PromoBanner? {
+        return try {
+            firestore.collection("promoBanners").document(bannerId).get().await()
+                .toObject(PromoBanner::class.java)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    override suspend fun addPromoBanner(banner: PromoBanner) {
+        try {
+            firestore.collection("promoBanners").document().set(banner).await()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    override suspend fun updatePromoBanner(banner: PromoBanner) {
+        try {
+            firestore.collection("promoBanners").document(banner.id).set(banner).await()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    override suspend fun deletePromoBanner(bannerId: String) {
+        try {
+            firestore.collection("promoBanners").document(bannerId).delete().await()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 }

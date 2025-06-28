@@ -16,7 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MenuViewModel @Inject constructor(
     private val homeRepository: HomeRepository,
-    savedStateHandle: SavedStateHandle // Injected by Hilt to access navigation arguments.
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MenuUiState())
@@ -37,9 +37,7 @@ class MenuViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true) }
             try {
                 val items = homeRepository.getMenuItemsByCategory(categoryId)
-                // Set the category title from the first item found.
-                // A more robust solution might fetch the category name separately.
-                val title = items.firstOrNull()?.category ?: "Menu"
+                val title = items.firstOrNull()?.categoryName ?: "Menu"
 
                 _uiState.update {
                     it.copy(

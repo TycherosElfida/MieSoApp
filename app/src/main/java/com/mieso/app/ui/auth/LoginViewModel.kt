@@ -49,7 +49,7 @@ class AuthViewModel @Inject constructor(
             val newMode = if (it.authMode == AuthMode.SIGN_IN) AuthMode.SIGN_UP else AuthMode.SIGN_IN
             it.copy(
                 authMode = newMode,
-                emailError = null, // Clear errors when switching modes
+                emailError = null,
                 passwordError = null
             )
         }
