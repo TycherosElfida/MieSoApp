@@ -10,9 +10,9 @@
               <option name="connection">
                 <ConnectionSetting>
                   <option name="appId" value="com.mieso.app" />
-                  <option name="mobileSdkAppId" value="1:489525450575:android:4bcee0641b533985fad73a" />
-                  <option name="projectId" value="app-bf6e1c97" />
-                  <option name="projectNumber" value="489525450575" />
+                  <option name="mobileSdkAppId" value="1:950078487469:android:9c2a0a087c1f4519307f24" />
+                  <option name="projectId" value="mieso-app-d007c" />
+                  <option name="projectNumber" value="950078487469" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

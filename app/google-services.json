@@ -12,7 +12,20 @@
           "package_name": "com.mieso.app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "489525450575-cnks6jb3ilj4q89i4g2qoqrjten7mkch.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mieso.app",
+            "certificate_hash": "7486a557b4358ead3d2d0790b3f74f18e869e0a3"
+          }
+        },
+        {
+          "client_id": "489525450575-9dvcf7aj6spaqsokp07bipk8f3tn8dp1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDFl3p3UBGVumAHsolyV89dR2wDHRVbm9c"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "489525450575-9dvcf7aj6spaqsokp07bipk8f3tn8dp1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
