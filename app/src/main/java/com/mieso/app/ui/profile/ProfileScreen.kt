@@ -68,10 +68,10 @@ fun ProfileScreen(
                     ProfileMenuItem(
                         text = "Alamat Tersimpan",
                         icon = Icons.Outlined.LocationOn,
-                        onClick = { navController.navigate(Screen.DeliveryDetails.route) }
+                        onClick = { navController.navigate(Screen.ManageAddresses.route) }
                     )
                     ProfileMenuItem(
-                        text = "Transaksi Saya",
+                        text = "Riwayat Transaksi",
                         icon = Icons.Outlined.Discount,
                         onClick = { navController.navigate(Screen.Orders.route) }
                     )
@@ -86,17 +86,17 @@ fun ProfileScreen(
                     ProfileMenuItem(
                         text = "Pusat Bantuan",
                         icon = Icons.Outlined.HelpOutline,
-                        onClick = { /* TODO: Navigasi ke Pusat Bantuan */ }
+                        onClick = { navController.navigate(Screen.HelpCenter.route) }
                     )
                     ProfileMenuItem(
                         text = "Syarat & Ketentuan",
                         icon = Icons.Outlined.Description,
-                        onClick = { /* TODO: Navigasi ke S&K */ }
+                        onClick = { navController.navigate(Screen.TermsAndConditions.route) }
                     )
                     ProfileMenuItem(
                         text = "Kebijakan Privasi",
                         icon = Icons.Outlined.Shield,
-                        onClick = { /* TODO: Navigasi ke Kebijakan Privasi */ }
+                        onClick = { navController.navigate(Screen.PrivacyPolicy.route) }
                     )
                 }
             }
@@ -150,11 +150,11 @@ private fun ProfileHeader(userData: UserData) {
         )
         Spacer(Modifier.width(16.dp))
         Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = userData.username ?: "Pengguna MieSo",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
-            )
+//            Text(
+//                text = userData.username ?: "Pengguna MieSo",
+//                style = MaterialTheme.typography.titleLarge,
+//                fontWeight = FontWeight.Bold
+//            )
             // Tampilkan Email
             userData.email?.let { email ->
                 Text(

@@ -11,10 +11,14 @@ import com.mieso.app.ui.checkout.AddAddressScreen
 import com.mieso.app.ui.checkout.CheckoutScreen
 import com.mieso.app.ui.checkout.DeliveryDetailsScreen
 import com.mieso.app.ui.home.HomeScreen
+import com.mieso.app.ui.info.HelpCenterScreen
+import com.mieso.app.ui.info.PrivacyPolicyScreen
+import com.mieso.app.ui.info.TermsAndConditionsScreen
 import com.mieso.app.ui.menu.MenuScreen
 import com.mieso.app.ui.menu.detail.MenuItemDetailScreen
 import com.mieso.app.ui.orders.OrdersScreen
 import com.mieso.app.ui.payment.PaymentScreen
+import com.mieso.app.ui.profile.ManageAddressesScreen
 import com.mieso.app.ui.profile.ProfileScreen
 import com.mieso.app.ui.promo.PromoScreen
 import com.mieso.app.ui.search.SearchScreen
@@ -73,6 +77,19 @@ fun AppNavigation(navController: NavHostController) {
             PaymentScreen(navController = navController)
         }
 
+        composable(Screen.ManageAddresses.route) {
+            ManageAddressesScreen(navController = navController)
+        }
+
+        composable(Screen.HelpCenter.route) {
+            HelpCenterScreen(navController = navController)
+        }
+        composable(Screen.TermsAndConditions.route) {
+            TermsAndConditionsScreen(navController = navController)
+        }
+        composable(Screen.PrivacyPolicy.route) {
+            PrivacyPolicyScreen(navController = navController)
+        }
 
     }
 }

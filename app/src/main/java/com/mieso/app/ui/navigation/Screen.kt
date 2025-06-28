@@ -38,4 +38,10 @@ sealed class Screen(val route: String) {
     object DeliveryDetails : Screen("delivery_details_screen")
 
     object Payment : Screen("payment_screen")
+
+    object ManageAddresses : Screen("manage_addresses_screen")
+
+    object HelpCenter : Screen("help_center_screen")
+    object TermsAndConditions : Screen("terms_and_conditions_screen")
+    object PrivacyPolicy : Screen("privacy_policy_screen")
 }
