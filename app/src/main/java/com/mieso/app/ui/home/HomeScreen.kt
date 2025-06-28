@@ -2,6 +2,7 @@ package com.mieso.app.ui.home
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -20,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -32,7 +34,6 @@ import com.mieso.app.ui.navigation.Screen
 import kotlinx.coroutines.delay
 import java.text.NumberFormat
 import java.util.Locale
-import androidx.compose.foundation.clickable // -> Tambahkan import ini
 
 @Composable
 fun HomeScreen(
@@ -53,14 +54,15 @@ fun HomeScreen(
         contentPadding = PaddingValues(bottom = 16.dp)
     ) {
         item { WelcomeHeader() }
-        item { // MODIFIKASI: Bungkus SearchBar dengan Box yang bisa diklik
+        item {
             Box(
                 modifier = Modifier
                     .padding(horizontal = 16.dp, vertical = 8.dp)
                     .clickable { navController.navigate(Screen.Search.route) }
             ) {
-                SearchBar(enabled = false) // enabled = false agar tidak fokus
-            } }
+                SearchBar(enabled = false)
+            }
+        }
         item { PromoBanners(banners = uiState.promoBanners, isLoading = uiState.isLoading) }
         item {
             SectionHeader(title = "Kategori")
@@ -82,8 +84,85 @@ fun HomeScreen(
                 }
             )
         }
+
+        // ==========================================================
+        // ===       BAGIAN MENU YANG TELAH DIPERBAIKI            ===
+        // ==========================================================
+        item {
+            SectionHeader(title = "Menu", modifier = Modifier.padding(top = 16.dp))
+        }
+
+        if (uiState.isLoading) {
+            // Tampilkan placeholder loading jika sedang memuat
+            items(2) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Box(modifier = Modifier.weight(1f)) {
+                        Card(
+                            modifier = Modifier.fillMaxWidth().height(220.dp),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                        ) {}
+                    }
+                    Box(modifier = Modifier.weight(1f)) {
+                        Card(
+                            modifier = Modifier.fillMaxWidth().height(220.dp),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                        ) {}
+                    }
+                }
+                Spacer(Modifier.height(12.dp))
+            }
+        } else if (uiState.allMenuItems.isEmpty()) {
+            // Tampilkan pesan jika tidak ada menu
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 40.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Menu belum tersedia.",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        } else {
+            // Tampilkan menu dalam grid 2 kolom
+            items(uiState.allMenuItems.chunked(2)) { rowItems ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    rowItems.forEach { menuItem ->
+                        Box(modifier = Modifier.weight(1f)) {
+                            MenuItemCard(
+                                item = menuItem,
+                                modifier = Modifier.fillMaxWidth(),
+                                onClick = {
+                                    navController.navigate(Screen.MenuItemDetail.createRoute(menuItem.id))
+                                }
+                            )
+                        }
+                    }
+                    // Jika jumlah item ganjil, tambahkan Spacer agar rata kiri
+                    if (rowItems.size < 2) {
+                        Spacer(Modifier.weight(1f))
+                    }
+                }
+                Spacer(Modifier.height(12.dp))
+            }
+        }
     }
 }
+
 
 // --- Reusable Child Composables ---
 
@@ -263,7 +342,7 @@ fun MenuItemCarousel(
             items(items, key = { it.id }) { item ->
                 MenuItemCard(
                     item = item,
-                    // FIX: Pass the navigation logic here
+                    modifier = Modifier.width(160.dp),
                     onClick = { onItemClick(item.id) }
                 )
             }
@@ -274,11 +353,12 @@ fun MenuItemCarousel(
 @Composable
 fun MenuItemCard(
     item: MenuItem,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     Card(
         onClick = onClick,
-        modifier = Modifier.width(160.dp),
+        modifier = modifier,
         shape = RoundedCornerShape(12.dp)
     ) {
         Column {

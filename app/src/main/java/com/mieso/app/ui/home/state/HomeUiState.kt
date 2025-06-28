@@ -9,5 +9,6 @@ data class HomeUiState(
     val promoBanners: List<PromoBanner> = emptyList(),
     val categories: List<FoodCategory> = emptyList(),
     val recommendedItems: List<MenuItem> = emptyList(),
+    val allMenuItems: List<MenuItem> = emptyList(),
     val error: String? = null // To handle potential errors
 )

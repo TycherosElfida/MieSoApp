@@ -77,6 +77,19 @@ class HomeRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getAllMenuItems(): List<MenuItem> {
+        return try {
+            firestore.collection("menuItems")
+                .orderBy("name") // Urutkan berdasarkan nama untuk konsistensi
+                .get()
+                .await()
+                .toObjects(MenuItem::class.java)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emptyList()
+        }
+    }
+
     override suspend fun searchMenuItems(query: String): List<MenuItem> {
         if (query.isBlank()) {
             return emptyList()

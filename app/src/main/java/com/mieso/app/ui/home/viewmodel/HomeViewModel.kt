@@ -31,13 +31,15 @@ class HomeViewModel @Inject constructor(
                 val banners = homeRepository.getPromoBanners()
                 val categories = homeRepository.getCategories()
                 val recommended = homeRepository.getRecommendedItems()
+                val allItems = homeRepository.getAllMenuItems()
 
                 _uiState.update {
                     it.copy(
                         isLoading = false,
                         promoBanners = banners,
                         categories = categories,
-                        recommendedItems = recommended
+                        recommendedItems = recommended,
+                        allMenuItems = allItems
                     )
                 }
             } catch (e: Exception) {
