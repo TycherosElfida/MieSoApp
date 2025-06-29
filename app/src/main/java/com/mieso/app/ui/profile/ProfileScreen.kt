@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.automirrored.outlined.HelpOutline
+import androidx.compose.material.icons.automirrored.outlined.ReceiptLong
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -103,7 +104,7 @@ fun ProfileScreen(
                     )
                     ProfileMenuItem(
                         text = "Riwayat Transaksi",
-                        icon = Icons.Outlined.Discount,
+                        icon = Icons.AutoMirrored.Outlined.ReceiptLong,
                         onClick = { navController.navigate(Screen.Orders.route) }
                     )
                 }
