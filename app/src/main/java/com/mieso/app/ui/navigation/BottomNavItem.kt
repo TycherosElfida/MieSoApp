@@ -1,10 +1,10 @@
 package com.mieso.app.ui.navigation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ReceiptLong
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.Discount
 import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.ui.graphics.vector.ImageVector
 
@@ -33,7 +33,7 @@ val bottomNavItems = listOf(
     ),
     BottomNavItem(
         label = "Orders",
-        icon = Icons.Outlined.Discount,
+        icon = Icons.AutoMirrored.Outlined.ReceiptLong,
         screen = Screen.Orders
     ),
     BottomNavItem(
