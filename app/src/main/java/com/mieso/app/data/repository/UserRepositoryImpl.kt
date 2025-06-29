@@ -36,4 +36,19 @@ class UserRepositoryImpl @Inject constructor(
             e.printStackTrace()
         }
     }
+
+    override suspend fun updateUserProfile(userId: String, newUsername: String, newProfilePictureUrl: String): Result<Unit> {
+        return try {
+            val userRef = firestore.collection("users").document(userId)
+            val updates = mapOf(
+                "username" to newUsername,
+                "profilePictureUrl" to newProfilePictureUrl
+            )
+            userRef.update(updates).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.failure(e)
+        }
+    }
 }

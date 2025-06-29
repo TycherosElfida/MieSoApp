@@ -1,9 +1,8 @@
-// File: app/src/main/java/com/mieso/app/ui/profile/ProfileScreen.kt
-
 package com.mieso.app.ui.profile
 
 import android.app.Activity
 import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -14,6 +13,8 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.material.icons.automirrored.outlined.ReceiptLong
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -40,35 +41,64 @@ fun ProfileScreen(
     navController: NavController,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
-    // Menggunakan state 'user' secara langsung dari ViewModel. Ini lebih ringkas.
     val user by viewModel.user.collectAsState()
-
-    // State untuk mengontrol dialog logout
+    val updateResult by viewModel.updateResult.collectAsState()
     var showLogoutDialog by remember { mutableStateOf(false) }
+    var isEditing by remember { mutableStateOf(false) }
+
+    var username by remember(user?.username) { mutableStateOf(user?.username ?: "") }
+    var profilePictureUrl by remember(user?.profilePictureUrl) { mutableStateOf(user?.profilePictureUrl ?: "") }
+
     val context = LocalContext.current
 
-    // Menampilkan dialog jika 'showLogoutDialog' bernilai true
+    LaunchedEffect(updateResult) {
+        updateResult?.let { result ->
+            if (result.isSuccess) {
+                Toast.makeText(context, "Profil berhasil diperbarui!", Toast.LENGTH_SHORT).show()
+                isEditing = false
+            } else {
+                val errorMessage = result.exceptionOrNull()?.message ?: "Gagal memperbarui profil."
+                Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
+            }
+            viewModel.consumeUpdateResult()
+        }
+    }
+
     if (showLogoutDialog) {
         LogoutConfirmationDialog(
             onConfirmLogout = {
                 showLogoutDialog = false
                 viewModel.signOut()
-
-                // Logika untuk memulai ulang aplikasi
                 val intent = Intent(context, MainActivity::class.java)
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
                 context.startActivity(intent)
                 (context as? Activity)?.finish()
             },
-            onDismiss = {
-                showLogoutDialog = false
-            }
+            onDismiss = { showLogoutDialog = false }
         )
     }
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Profil Saya") })
+            TopAppBar(
+                title = { Text("Profil Saya") },
+                actions = {
+                    if (user != null) {
+                        IconButton(onClick = {
+                            if (isEditing) {
+                                viewModel.updateProfile(username, profilePictureUrl)
+                            } else {
+                                isEditing = true
+                            }
+                        }) {
+                            Icon(
+                                imageVector = if (isEditing) Icons.Default.Done else Icons.Default.Edit,
+                                contentDescription = if (isEditing) "Simpan" else "Edit"
+                            )
+                        }
+                    }
+                }
+            )
         }
     ) { paddingValues ->
         LazyColumn(
@@ -77,19 +107,22 @@ fun ProfileScreen(
                 .padding(paddingValues)
         ) {
             item {
-                // Menampilkan header profil jika data user sudah tersedia
                 if (user == null) {
                     Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(100.dp),
+                        modifier = Modifier.fillMaxWidth().height(200.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator()
                     }
                 } else {
-                    // Menggunakan Composable ProfileHeader yang sudah diperbarui
-                    ProfileHeader(userData = user!!)
+                    ProfileHeader(
+                        userData = user!!,
+                        isEditing = isEditing,
+                        username = username,
+                        profilePictureUrl = profilePictureUrl,
+                        onUsernameChange = { username = it },
+                        onProfilePictureUrlChange = { profilePictureUrl = it }
+                    )
                 }
             }
 
@@ -119,10 +152,7 @@ fun ProfileScreen(
                         ProfileMenuItem(
                             text = "Admin Dashboard",
                             icon = Icons.Outlined.AdminPanelSettings,
-                            onClick = {
-                                // UBAH BARIS INI: Arahkan ke rute grafik admin
-                                navController.navigate(AdminGraph.route)
-                            }
+                            onClick = { navController.navigate(AdminGraph.route) }
                         )
                     }
                 }
@@ -153,14 +183,11 @@ fun ProfileScreen(
 
             item { Spacer(modifier = Modifier.height(24.dp)) }
 
-            // Tombol Keluar dengan logika dialog
             item {
                 Box(modifier = Modifier.padding(horizontal = 16.dp)) {
                     Button(
-                        onClick = { showLogoutDialog = true }, // Menampilkan dialog
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp),
+                        onClick = { showLogoutDialog = true },
+                        modifier = Modifier.fillMaxWidth().height(50.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.errorContainer,
                             contentColor = MaterialTheme.colorScheme.onErrorContainer
@@ -181,7 +208,6 @@ fun ProfileScreen(
     }
 }
 
-// Composable untuk dialog logout
 @Composable
 private fun LogoutConfirmationDialog(
     onConfirmLogout: () -> Unit,
@@ -194,9 +220,7 @@ private fun LogoutConfirmationDialog(
         confirmButton = {
             Button(
                 onClick = onConfirmLogout,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.error
-                )
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
             ) {
                 Text("Keluar")
             }
@@ -209,39 +233,52 @@ private fun LogoutConfirmationDialog(
     )
 }
 
-// ProfileHeader yang sudah disesuaikan dengan model User
 @Composable
-private fun ProfileHeader(userData: User) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically
+private fun ProfileHeader(
+    userData: User,
+    isEditing: Boolean,
+    username: String,
+    profilePictureUrl: String,
+    onUsernameChange: (String) -> Unit,
+    onProfilePictureUrlChange: (String) -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         AsyncImage(
-            model = userData.profilePictureUrl,
+            model = if (isEditing) profilePictureUrl.ifBlank { userData.profilePictureUrl } else userData.profilePictureUrl,
             contentDescription = "Foto Profil",
             contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(64.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.surfaceVariant)
+            modifier = Modifier.size(96.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceVariant)
         )
-        Spacer(Modifier.width(16.dp))
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = userData.username ?: "Pengguna MieSo",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
+
+        if (isEditing) {
+            OutlinedTextField(
+                value = username,
+                onValueChange = onUsernameChange,
+                label = { Text("Username") },
+                modifier = Modifier.fillMaxWidth()
             )
-            userData.email?.let { email ->
-                Text(text = email) // Style bisa disesuaikan lagi jika perlu
+            OutlinedTextField(
+                value = profilePictureUrl,
+                onValueChange = onProfilePictureUrlChange,
+                label = { Text("URL Gambar Profil") },
+                placeholder = { Text("https://example.com/image.png") },
+                modifier = Modifier.fillMaxWidth()
+            )
+        } else {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = userData.username ?: "Pengguna MieSo",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
+                userData.email?.let { email ->
+                    Text(text = email)
+                }
             }
-            Text(
-                text = "ID: ${userData.id}",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-            )
         }
     }
 }

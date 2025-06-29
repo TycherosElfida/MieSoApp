@@ -9,4 +9,5 @@ interface UserRepository {
     fun getUserAddresses(userId: String): Flow<List<UserAddress>>
     suspend fun addAddress(userId: String, address: UserAddress)
     // Add other functions like updateUser, etc. later
+    suspend fun updateUserProfile(userId: String, newUsername: String, newProfilePictureUrl: String): Result<Unit>
 }
