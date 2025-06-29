@@ -42,26 +42,12 @@ class HomeRepositoryImpl @Inject constructor(
 
     override suspend fun getMenuItemsByCategory(categoryId: String): List<MenuItem> {
         return try {
-            // Note: In a production app, you might want to fetch the category name
-            // from the categoryId to display in the header. For now, we assume
-            // the ID is sufficient for the query. To do this, we query the 'categories'
-            // collection first, find the document with the matching ID, and then use its 'name'
-            // field in the 'whereEqualTo' clause for 'menuItems'.
-            // For this implementation, we will assume the categoryId passed is the name itself.
-            val categoryDocument = firestore.collection("categories").document(categoryId).get().await()
-            val categoryName = categoryDocument.getString("name") ?: ""
-
-            if (categoryName.isNotEmpty()) {
-                firestore.collection("menuItems")
-                    .whereEqualTo("category", categoryName)
-                    .get()
-                    .await()
-                    .toObjects(MenuItem::class.java)
-            } else {
-                emptyList()
-            }
+            firestore.collection("menuItems")
+                .whereEqualTo("categoryId", categoryId) // Query by the correct field: categoryId
+                .get()
+                .await()
+                .toObjects(MenuItem::class.java)
         } catch (e: Exception) {
-            // Log the error in a real app
             e.printStackTrace()
             emptyList()
         }
@@ -132,25 +118,40 @@ class HomeRepositoryImpl @Inject constructor(
         }
     }
 
+    // THIS IS THE CRITICAL FIX for CREATING new menu items.
     override suspend fun addMenuItem(menuItem: MenuItem) {
         try {
-            firestore.collection("menuItems").add(menuItem).await()
+            // 1. Create a reference to a new, empty document in the 'menuItems' collection.
+            val newMenuItemRef = firestore.collection("menuItems").document()
+            // 2. Explicitly set the ID in our object from the new document reference.
+            val menuItemWithId = menuItem.copy(id = newMenuItemRef.id)
+            // 3. Use .set() to save the complete object to the new document reference.
+            newMenuItemRef.set(menuItemWithId).await()
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
+    // THIS IS THE CRITICAL FIX for UPDATING existing menu items.
     override suspend fun updateMenuItem(menuItem: MenuItem) {
         try {
+            // Guard against trying to update an item without an ID.
+            if (menuItem.id.isBlank()) {
+                throw IllegalArgumentException("MenuItem ID cannot be blank for update.")
+            }
+            // Use .set() on a document reference that includes the specific ID.
             firestore.collection("menuItems").document(menuItem.id).set(menuItem).await()
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
+    // We will apply the same robust logic to categories and banners.
     override suspend fun addCategory(category: FoodCategory) {
         try {
-            firestore.collection("categories").add(category).await()
+            val newCategoryRef = firestore.collection("categories").document()
+            val categoryWithId = category.copy(id = newCategoryRef.id)
+            newCategoryRef.set(categoryWithId).await()
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -158,6 +159,7 @@ class HomeRepositoryImpl @Inject constructor(
 
     override suspend fun updateCategory(category: FoodCategory) {
         try {
+            if (category.id.isBlank()) return
             firestore.collection("categories").document(category.id).set(category).await()
         } catch (e: Exception) {
             e.printStackTrace()
@@ -192,7 +194,9 @@ class HomeRepositoryImpl @Inject constructor(
 
     override suspend fun addPromoBanner(banner: PromoBanner) {
         try {
-            firestore.collection("promoBanners").document().set(banner).await()
+            val newBannerRef = firestore.collection("promoBanners").document()
+            val bannerWithId = banner.copy(id = newBannerRef.id)
+            newBannerRef.set(bannerWithId).await()
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -200,6 +204,7 @@ class HomeRepositoryImpl @Inject constructor(
 
     override suspend fun updatePromoBanner(banner: PromoBanner) {
         try {
+            if (banner.id.isBlank()) return
             firestore.collection("promoBanners").document(banner.id).set(banner).await()
         } catch (e: Exception) {
             e.printStackTrace()

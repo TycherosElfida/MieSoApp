@@ -103,7 +103,12 @@ class AdminViewModel @Inject constructor(
     fun onNameChanged(name: String) = _addEditScreenUiState.update { it.copy(name = name) }
     fun onDescriptionChanged(description: String) = _addEditScreenUiState.update { it.copy(description = description) }
     fun onPriceChanged(price: String) = _addEditScreenUiState.update { it.copy(price = price) }
+
     fun onCategoryChanged(categoryId: String, categoryName: String) = _addEditScreenUiState.update { it.copy(categoryId = categoryId, categoryName = categoryName) }
+
+//    fun onCategoryChanged(categoryId: String, categoryName: String) {
+//        _addEditScreenUiState.update { it.copy(categoryId = categoryId, categoryName = categoryName) }
+//    }
     fun onIsRecommendedChanged(isRecommended: Boolean) = _addEditScreenUiState.update { it.copy(isRecommended = isRecommended) }
     fun onImageSelected(uri: Uri) = _addEditScreenUiState.update { it.copy(selectedImageUri = uri) }
 

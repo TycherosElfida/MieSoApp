@@ -289,7 +289,7 @@ fun SectionHeader(title: String, modifier: Modifier = Modifier) {
 
 @Composable
 fun CategoryChips(
-    categories: List<FoodCategory>,
+    categories: List<com.mieso.app.data.model.FoodCategory>,
     isLoading: Boolean,
     onCategoryClick: (categoryId: String) -> Unit
 ) {

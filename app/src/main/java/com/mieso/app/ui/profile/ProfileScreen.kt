@@ -224,11 +224,11 @@ private fun ProfileHeader(userData: User) {
         )
         Spacer(Modifier.width(16.dp))
         Column(modifier = Modifier.weight(1f)) {
-//            Text(
-//                text = userData.username ?: "Pengguna MieSo",
-//                style = MaterialTheme.typography.titleLarge,
-//                fontWeight = FontWeight.Bold
-//            )
+            Text(
+                text = userData.username ?: "Pengguna MieSo",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
             userData.email?.let { email ->
                 Text(text = email) // Style bisa disesuaikan lagi jika perlu
             }

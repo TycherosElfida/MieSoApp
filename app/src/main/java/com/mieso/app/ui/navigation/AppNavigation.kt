@@ -53,6 +53,7 @@ fun AppNavigation(navController: NavHostController) {
 
         composable(
             route = Screen.Menu.route,
+            // This line is essential. It defines the expected argument and its type.
             arguments = listOf(navArgument(NavArguments.CATEGORY_ID) { type = NavType.StringType })
         ) {
             MenuScreen(navController = navController)

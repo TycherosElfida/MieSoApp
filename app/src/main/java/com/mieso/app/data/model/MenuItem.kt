@@ -8,7 +8,7 @@ data class MenuItem(
     val description: String = "",
     val price: Long = 0,
     val imageUrl: String = "",
-    val categoryId: String = "",
-    val categoryName: String = "",
+    val categoryId: String = "", // This will be our primary link for queries
+    val categoryName: String = "", // This is for display purposes
     val isRecommended: Boolean = false
 )
