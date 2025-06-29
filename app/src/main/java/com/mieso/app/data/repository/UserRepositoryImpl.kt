@@ -22,8 +22,18 @@ class UserRepositoryImpl @Inject constructor(
             }
     }
 
+//    override suspend fun addAddress(userId: String, address: UserAddress) {
+//        firestore.collection("users").document(userId).collection("addresses")
+//            .add(address).await() // Using .add() is correct for creating a new document with an auto-generated ID
+//    }
+
     override suspend fun addAddress(userId: String, address: UserAddress) {
-        firestore.collection("users").document(userId).collection("addresses")
-            .add(address).await() // Using .add() is correct for creating a new document with an auto-generated ID
+        try {
+            firestore.collection("users").document(userId).collection("addresses")
+                .add(address).await()
+        } catch (e: Exception) {
+            // Cetak error ke Logcat untuk debugging, tapi jangan biarkan aplikasi crash.
+            e.printStackTrace()
+        }
     }
 }
