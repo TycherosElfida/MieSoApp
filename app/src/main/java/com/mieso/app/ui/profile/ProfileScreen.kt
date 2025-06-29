@@ -32,6 +32,7 @@ import com.mieso.app.MainActivity
 import com.mieso.app.data.model.User
 import com.mieso.app.ui.navigation.Screen
 import com.mieso.app.ui.profile.viewmodel.ProfileViewModel
+import com.mieso.app.ui.navigation.AdminGraph
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -118,7 +119,10 @@ fun ProfileScreen(
                         ProfileMenuItem(
                             text = "Admin Dashboard",
                             icon = Icons.Outlined.AdminPanelSettings,
-                            onClick = { navController.navigate(Screen.AdminDashboard.route) }
+                            onClick = {
+                                // UBAH BARIS INI: Arahkan ke rute grafik admin
+                                navController.navigate(AdminGraph.route)
+                            }
                         )
                     }
                 }
