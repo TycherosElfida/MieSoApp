@@ -1,5 +1,3 @@
-// File: app/src/main/java/com/mieso/app/ui/navigation/Screen.kt
-
 package com.mieso.app.ui.navigation
 
 object NavArguments {
@@ -36,8 +34,13 @@ sealed class Screen(val route: String) {
     object PrivacyPolicy : Screen("privacy_policy_screen")
 
     // --- Admin Routes ---
-    object AdminDashboard : Screen("admin_dashboard_screen") // <-- TAMBAHKAN BARIS INI
+    object AdminDashboard : Screen("admin_dashboard_screen")
     object AdminMenu : Screen("admin_menu_screen")
+
+    /**
+     * Route for the screen where admins can view and manage all incoming orders.
+     */
+    object AdminManageOrders : Screen("admin_manage_orders_screen")
 
     object AddEditMenuItem : Screen("add_edit_menu_item_screen?menuItemId={menuItemId}") {
         fun createRoute(menuItemId: String? = null): String {

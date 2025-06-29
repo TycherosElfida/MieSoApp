@@ -15,7 +15,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    userDataProvider: UserDataProvider // Inject the provider
+    userDataProvider: UserDataProvider
 ) : ViewModel() {
 
     val user: StateFlow<User?> = userDataProvider.user

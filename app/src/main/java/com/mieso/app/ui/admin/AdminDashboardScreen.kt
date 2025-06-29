@@ -1,5 +1,3 @@
-// File: app/src/main/java/com/mieso/app/ui/admin/AdminDashboardScreen.kt
-
 package com.mieso.app.ui.admin
 
 import androidx.compose.foundation.clickable
@@ -12,6 +10,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.Campaign
 import androidx.compose.material.icons.outlined.Category
+import androidx.compose.material.icons.outlined.Dns
 import androidx.compose.material.icons.outlined.RestaurantMenu
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -26,13 +25,19 @@ import com.mieso.app.ui.navigation.Screen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdminDashboardScreen(navController: NavController) {
-    // Daftar item yang akan ditampilkan di dashboard
     val adminMenuItems = listOf(
         AdminDashboardItem(
             title = "Manage Menu",
             description = "Atur semua menu makanan dan minuman.",
             icon = Icons.Outlined.RestaurantMenu,
             screen = Screen.AdminMenu
+        ),
+
+        AdminDashboardItem(
+            title = "Manage Orders",
+            description = "Lihat dan kelola semua pesanan masuk.",
+            icon = Icons.Outlined.Dns, // Ikon yang merepresentasikan data/pesanan
+            screen = Screen.AdminManageOrders
         ),
         AdminDashboardItem(
             title = "Manage Categories",
@@ -63,9 +68,8 @@ fun AdminDashboardScreen(navController: NavController) {
             )
         }
     ) { paddingValues ->
-        // Menggunakan LazyVerticalGrid agar tata letak rapi dan scalable
         LazyVerticalGrid(
-            columns = GridCells.Fixed(1), // Satu kartu per baris
+            columns = GridCells.Fixed(1),
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues),
