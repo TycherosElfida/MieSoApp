@@ -95,7 +95,7 @@ fun ManageAddressesScreen(
             items(uiState.userAddresses, key = { it.id }) { address ->
                 AddressCard(
                     address = address,
-                    isSelected = false, // Tidak ada alamat yang dipilih di halaman ini
+                    isSelected = false,
                     onClick = {
                         // Di masa depan, ini bisa diarahkan ke halaman edit alamat
                     }

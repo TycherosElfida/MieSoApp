@@ -23,20 +23,15 @@ class OrdersViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            // Listen to authentication state changes.
             authRepository.getAuthState().flatMapLatest { user ->
                 if (user != null) {
-                    // If a user is logged in, fetch their orders.
                     orderRepository.getUserOrders(user.uid)
                 } else {
-                    // If no user, return a flow with an empty list.
                     flowOf(emptyList())
                 }
             }.catch { e ->
-                // Handle any errors from the upstream flows.
                 _uiState.update { it.copy(isLoading = false, error = e.message) }
             }.collect { orders ->
-                // Update the state with the new list of orders.
                 _uiState.update { it.copy(isLoading = false, orders = orders) }
             }
         }
