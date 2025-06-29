@@ -1,3 +1,5 @@
+// File: app/src/main/java/com/mieso/app/ui/navigation/Screen.kt
+
 package com.mieso.app.ui.navigation
 
 object NavArguments {
@@ -8,19 +10,12 @@ object NavArguments {
 sealed class Screen(val route: String) {
 
     object Login : Screen("login_screen")
-
     object Main : Screen("main_screen")
-
     object Home : Screen("home_screen")
-
     object Search : Screen("search_screen")
-
     object Orders : Screen("orders_screen")
-
     object Promo : Screen("promo_screen")
-
     object Profile : Screen("profile_screen")
-
     object Cart : Screen("cart_screen")
 
     object Menu : Screen("menu_screen/{${NavArguments.CATEGORY_ID}}") {
@@ -32,21 +27,16 @@ sealed class Screen(val route: String) {
     }
 
     object Checkout : Screen("checkout_screen")
-
     object AddAddressScreen : Screen("add_address_screen")
-
     object DeliveryDetails : Screen("delivery_details_screen")
-
     object Payment : Screen("payment_screen")
-
     object ManageAddresses : Screen("manage_addresses_screen")
-
     object HelpCenter : Screen("help_center_screen")
-
     object TermsAndConditions : Screen("terms_and_conditions_screen")
-
     object PrivacyPolicy : Screen("privacy_policy_screen")
 
+    // --- Admin Routes ---
+    object AdminDashboard : Screen("admin_dashboard_screen") // <-- TAMBAHKAN BARIS INI
     object AdminMenu : Screen("admin_menu_screen")
 
     object AddEditMenuItem : Screen("add_edit_menu_item_screen?menuItemId={menuItemId}") {
@@ -59,9 +49,7 @@ sealed class Screen(val route: String) {
         }
     }
     object AdminCategories : Screen("admin_categories_screen")
-
     object AdminPromoBanners : Screen("admin_promo_banners_screen")
-
     object AddEditPromoBanner : Screen("add_edit_promo_banner_screen?bannerId={bannerId}") {
         fun createRoute(bannerId: String? = null): String {
             return if (bannerId != null) {

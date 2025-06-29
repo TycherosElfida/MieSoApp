@@ -1,5 +1,9 @@
+// File: app/src/main/java/com/mieso/app/ui/profile/ProfileScreen.kt
+
 package com.mieso.app.ui.profile
 
+import android.app.Activity
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -11,20 +15,20 @@ import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
-import com.mieso.app.data.auth.UserData
+import com.mieso.app.MainActivity
+import com.mieso.app.data.model.User
 import com.mieso.app.ui.navigation.Screen
 import com.mieso.app.ui.profile.viewmodel.ProfileViewModel
 
@@ -34,8 +38,31 @@ fun ProfileScreen(
     navController: NavController,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    // Menggunakan state 'user' secara langsung dari ViewModel. Ini lebih ringkas.
     val user by viewModel.user.collectAsState()
+
+    // State untuk mengontrol dialog logout
+    var showLogoutDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+    // Menampilkan dialog jika 'showLogoutDialog' bernilai true
+    if (showLogoutDialog) {
+        LogoutConfirmationDialog(
+            onConfirmLogout = {
+                showLogoutDialog = false
+                viewModel.signOut()
+
+                // Logika untuk memulai ulang aplikasi
+                val intent = Intent(context, MainActivity::class.java)
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+                context.startActivity(intent)
+                (context as? Activity)?.finish()
+            },
+            onDismiss = {
+                showLogoutDialog = false
+            }
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -48,7 +75,8 @@ fun ProfileScreen(
                 .padding(paddingValues)
         ) {
             item {
-                if (uiState.isLoading) {
+                // Menampilkan header profil jika data user sudah tersedia
+                if (user == null) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -57,8 +85,9 @@ fun ProfileScreen(
                     ) {
                         CircularProgressIndicator()
                     }
-                } else if (uiState.userData != null) {
-                    ProfileHeader(userData = uiState.userData!!)
+                } else {
+                    // Menggunakan Composable ProfileHeader yang sudah diperbarui
+                    ProfileHeader(userData = user!!)
                 }
             }
 
@@ -80,30 +109,21 @@ fun ProfileScreen(
                 }
             }
 
-            item { HorizontalDivider(thickness = 8.dp, color = MaterialTheme.colorScheme.surfaceVariant) }
-
-            // Admin Menu Button
+            // Integrasi Admin Dashboard
             if (user?.role == "admin") {
                 item {
-                    ProfileMenuSection(title = "Admin") {
+                    HorizontalDivider(thickness = 8.dp, color = MaterialTheme.colorScheme.surfaceVariant)
+                    ProfileMenuSection(title = "Panel Admin") {
                         ProfileMenuItem(
-                            text = "Manage Menu",
-                            icon = Icons.Outlined.RestaurantMenu,
-                            onClick = { navController.navigate(Screen.AdminMenu.route) }
-                        )
-                        ProfileMenuItem(
-                            text = "Manage Categories",
-                            icon = Icons.Outlined.Category,
-                            onClick = { navController.navigate(Screen.AdminCategories.route) }
-                        )
-                        ProfileMenuItem(
-                            text = "Manage Promo Banners",
-                            icon = Icons.Outlined.Campaign,
-                            onClick = { navController.navigate(Screen.AdminPromoBanners.route) }
+                            text = "Admin Dashboard",
+                            icon = Icons.Outlined.AdminPanelSettings,
+                            onClick = { navController.navigate(Screen.AdminDashboard.route) }
                         )
                     }
                 }
             }
+
+            item { HorizontalDivider(thickness = 8.dp, color = MaterialTheme.colorScheme.surfaceVariant) }
 
             // Menu Informasi
             item {
@@ -128,11 +148,11 @@ fun ProfileScreen(
 
             item { Spacer(modifier = Modifier.height(24.dp)) }
 
-            // Tombol Keluar
+            // Tombol Keluar dengan logika dialog
             item {
                 Box(modifier = Modifier.padding(horizontal = 16.dp)) {
                     Button(
-                        onClick = viewModel::signOut,
+                        onClick = { showLogoutDialog = true }, // Menampilkan dialog
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp),
@@ -156,8 +176,37 @@ fun ProfileScreen(
     }
 }
 
+// Composable untuk dialog logout
 @Composable
-private fun ProfileHeader(userData: UserData) {
+private fun LogoutConfirmationDialog(
+    onConfirmLogout: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = "Konfirmasi Keluar") },
+        text = { Text(text = "Apakah Anda yakin ingin keluar dari akun Anda?") },
+        confirmButton = {
+            Button(
+                onClick = onConfirmLogout,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.error
+                )
+            ) {
+                Text("Keluar")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Batal")
+            }
+        }
+    )
+}
+
+// ProfileHeader yang sudah disesuaikan dengan model User
+@Composable
+private fun ProfileHeader(userData: User) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -181,15 +230,10 @@ private fun ProfileHeader(userData: UserData) {
 //                fontWeight = FontWeight.Bold
 //            )
             userData.email?.let { email ->
-                Text(
-                    text = email,
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                Text(text = email) // Style bisa disesuaikan lagi jika perlu
             }
-            // Tampilkan ID Pengguna
             Text(
-                text = "ID: ${userData.userId}",
+                text = "ID: ${userData.id}",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
             )

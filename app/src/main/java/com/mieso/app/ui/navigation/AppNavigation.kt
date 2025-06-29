@@ -1,3 +1,5 @@
+// File: app/src/main/java/com/mieso/app/ui/navigation/AppNavigation.kt
+
 package com.mieso.app.ui.navigation
 
 import androidx.compose.runtime.Composable
@@ -9,6 +11,7 @@ import androidx.navigation.navArgument
 import com.mieso.app.ui.admin.AddEditMenuItemScreen
 import com.mieso.app.ui.admin.AddEditPromoBannerScreen
 import com.mieso.app.ui.admin.AdminCategoriesScreen
+import com.mieso.app.ui.admin.AdminDashboardScreen // <-- TAMBAHKAN IMPORT INI
 import com.mieso.app.ui.admin.AdminMenuScreen
 import com.mieso.app.ui.admin.AdminPromoBannersScreen
 import com.mieso.app.ui.cart.CartScreen
@@ -94,6 +97,11 @@ fun AppNavigation(navController: NavHostController) {
         }
         composable(Screen.PrivacyPolicy.route) {
             PrivacyPolicyScreen(navController = navController)
+        }
+
+        // --- Rute Admin ---
+        composable(Screen.AdminDashboard.route) { // <-- TAMBAHKAN BLOK INI
+            AdminDashboardScreen(navController = navController)
         }
 
         composable(Screen.AdminMenu.route) {
