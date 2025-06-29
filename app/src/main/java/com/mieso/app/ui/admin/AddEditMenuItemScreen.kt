@@ -31,11 +31,11 @@ fun AddEditMenuItemScreen(
     val uiState by viewModel.addEditScreenUiState.collectAsState()
     val categories by viewModel.categories.collectAsState()
 
-    val imagePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        uri?.let { viewModel.onImageSelected(it) }
-    }
+//    val imagePickerLauncher = rememberLauncherForActivityResult(
+//        contract = ActivityResultContracts.GetContent()
+//    ) { uri: Uri? ->
+//        uri?.let { viewModel.onImageSelected(it) }
+//    }
 
     Scaffold(
         topBar = {
@@ -87,17 +87,19 @@ fun AddEditMenuItemScreen(
 
             // --- Image Picker ---
             AsyncImage(
-                model = uiState.selectedImageUri ?: uiState.existingImageUrl,
+                model = uiState.imageUrl, // Gunakan state baru
                 contentDescription = "Menu Item Image",
                 modifier = Modifier.fillMaxWidth().height(200.dp).align(Alignment.CenterHorizontally),
                 contentScale = ContentScale.Crop
             )
-            Button(
-                onClick = { imagePickerLauncher.launch("image/*") },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Select Image")
-            }
+            // GANTI TOMBOL DENGAN TEXTFIELD INI
+            OutlinedTextField(
+                value = uiState.imageUrl,
+                onValueChange = viewModel::onImageUrlChanged, // Panggil fungsi baru
+                label = { Text("Image URL") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
+            )
 
             // --- Is Recommended Switch ---
             Row(

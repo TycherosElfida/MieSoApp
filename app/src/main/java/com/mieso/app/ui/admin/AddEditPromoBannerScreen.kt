@@ -29,11 +29,11 @@ fun AddEditPromoBannerScreen(
 ) {
     val uiState by viewModel.addEditBannerUiState.collectAsState()
 
-    val imagePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        uri?.let { viewModel.onBannerImageSelected(it) }
-    }
+//    val imagePickerLauncher = rememberLauncherForActivityResult(
+//        contract = ActivityResultContracts.GetContent()
+//    ) { uri: Uri? ->
+//        uri?.let { viewModel.onBannerImageSelected(it) }
+//    }
 
     Scaffold(
         topBar = {
@@ -70,17 +70,19 @@ fun AddEditPromoBannerScreen(
             )
 
             AsyncImage(
-                model = uiState.selectedImageUri ?: uiState.existingImageUrl,
+                model = uiState.imageUrl, // <-- Gunakan state yang sudah diubah
                 contentDescription = "Promo Banner Image",
                 modifier = Modifier.fillMaxWidth().height(200.dp).align(Alignment.CenterHorizontally),
                 contentScale = ContentScale.Crop
             )
-            Button(
-                onClick = { imagePickerLauncher.launch("image/*") },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Select Image")
-            }
+
+            OutlinedTextField(
+                value = uiState.imageUrl,
+                onValueChange = viewModel::onBannerImageUrlChanged, // Panggil fungsi baru
+                label = { Text("Image URL") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
