@@ -21,13 +21,13 @@ import com.mieso.app.data.model.CartItem
 import com.mieso.app.data.model.UserAddress
 import com.mieso.app.ui.home.formatToRupiah
 import com.mieso.app.ui.navigation.Screen
-import com.mieso.app.ui.payment.viewmodel.PaymentViewModel
+import com.mieso.app.ui.checkout.viewmodel.CheckoutViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PaymentScreen(
     navController: NavController,
-    viewModel: PaymentViewModel = hiltViewModel()
+    viewModel: CheckoutViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current

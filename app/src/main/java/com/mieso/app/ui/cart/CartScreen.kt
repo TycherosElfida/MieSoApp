@@ -25,6 +25,7 @@ import coil3.compose.AsyncImage
 import com.mieso.app.data.model.CartItem
 import com.mieso.app.ui.cart.viewmodel.CartViewModel
 import com.mieso.app.ui.home.formatToRupiah
+import com.mieso.app.ui.navigation.CheckoutGraph
 import com.mieso.app.ui.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,7 +46,7 @@ fun CartScreen(
                     totalPrice = uiState.totalPrice,
                     onCheckoutClicked = {
                         // This is the navigation logic to add
-                        navController.navigate(Screen.Checkout.route)
+                        navController.navigate(CheckoutGraph.route)
                     }
                 )
             }
