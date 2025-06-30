@@ -40,7 +40,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun loadHomeScreenData() {
+    fun loadHomeScreenData() {
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             try {

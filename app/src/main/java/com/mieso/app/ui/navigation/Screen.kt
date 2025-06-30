@@ -18,8 +18,10 @@ sealed class Screen(val route: String) {
     object Profile : Screen("profile_screen")
     object Cart : Screen("cart_screen")
 
-    object Menu : Screen("menu_screen/{${NavArguments.CATEGORY_ID}}/{${NavArguments.CATEGORY_NAME}}") {
-        fun createRoute(categoryId: String, categoryName: String) = "menu_screen/$categoryId/$categoryName"
+    object Menu :
+        Screen("menu_screen/{${NavArguments.CATEGORY_ID}}/{${NavArguments.CATEGORY_NAME}}") {
+        fun createRoute(categoryId: String, categoryName: String) =
+            "menu_screen/$categoryId/$categoryName"
     }
 
     object MenuItemDetail : Screen("menu_item_detail_screen/{${NavArguments.MENU_ITEM_ID}}") {

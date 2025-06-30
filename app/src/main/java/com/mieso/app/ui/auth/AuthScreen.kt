@@ -136,14 +136,26 @@ fun AuthScreen(onSignInSuccess: () -> Unit) {
                         label = "AuthFormAnimation",
                         transitionSpec = {
                             if (targetState == AuthMode.SIGN_IN) {
-                                slideInHorizontally(initialOffsetX = { -it }, animationSpec = tween(300)) +
+                                slideInHorizontally(
+                                    initialOffsetX = { -it },
+                                    animationSpec = tween(300)
+                                ) +
                                         fadeIn(animationSpec = tween(300)) togetherWith
-                                        slideOutHorizontally(targetOffsetX = { it }, animationSpec = tween(300)) +
+                                        slideOutHorizontally(
+                                            targetOffsetX = { it },
+                                            animationSpec = tween(300)
+                                        ) +
                                         fadeOut(animationSpec = tween(300))
                             } else {
-                                slideInHorizontally(initialOffsetX = { it }, animationSpec = tween(300)) +
+                                slideInHorizontally(
+                                    initialOffsetX = { it },
+                                    animationSpec = tween(300)
+                                ) +
                                         fadeIn(animationSpec = tween(300)) togetherWith
-                                        slideOutHorizontally(targetOffsetX = { -it }, animationSpec = tween(300)) +
+                                        slideOutHorizontally(
+                                            targetOffsetX = { -it },
+                                            animationSpec = tween(300)
+                                        ) +
                                         fadeOut(animationSpec = tween(300))
                             }
                         }

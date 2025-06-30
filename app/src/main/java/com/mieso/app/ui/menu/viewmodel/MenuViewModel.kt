@@ -23,7 +23,8 @@ class MenuViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     private val categoryId: String = savedStateHandle.get<String>(NavArguments.CATEGORY_ID) ?: ""
-    private val categoryName: String = savedStateHandle.get<String>(NavArguments.CATEGORY_NAME) ?: "Menu"
+    private val categoryName: String =
+        savedStateHandle.get<String>(NavArguments.CATEGORY_NAME) ?: "Menu"
 
     init {
         if (categoryId.isNotEmpty()) {

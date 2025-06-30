@@ -23,7 +23,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
@@ -51,6 +50,7 @@ import coil3.compose.AsyncImage
 import com.mieso.app.data.model.FoodCategory
 import com.mieso.app.data.model.MenuItem
 import com.mieso.app.data.model.PromoBanner
+import com.mieso.app.ui.common.FullScreenError
 import com.mieso.app.ui.home.viewmodel.HomeViewModel
 import com.mieso.app.ui.navigation.Screen
 import com.valentinilk.shimmer.shimmer
@@ -83,9 +83,11 @@ fun HomeScreen(
         } else if (uiState.error != null) {
             // Error state
             item {
-                Box(modifier = Modifier.fillParentMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(text = uiState.error!!)
-                }
+                FullScreenError(
+                    modifier = Modifier.fillParentMaxSize(),
+                    message = uiState.error ?: "Gagal memuat data.",
+                    onRetry = { viewModel.loadHomeScreenData() }
+                )
             }
         } else {
             // Content loaded successfully
@@ -102,9 +104,11 @@ fun HomeScreen(
             item { PromoBanners(banners = uiState.promoBanners) }
             item {
                 SectionHeader(title = "Kategori")
-                CategoryChips(categories = uiState.categories, onCategoryClick = { categoryId, categoryName ->
-                    navController.navigate(Screen.Menu.createRoute(categoryId, categoryName))
-                })
+                CategoryChips(
+                    categories = uiState.categories,
+                    onCategoryClick = { categoryId, categoryName ->
+                        navController.navigate(Screen.Menu.createRoute(categoryId, categoryName))
+                    })
             }
             item {
                 SectionHeader(title = "Rekomendasi Untukmu")
@@ -144,7 +148,11 @@ fun HomeScreen(
                         rowItems.forEach { menuItem ->
                             Box(modifier = Modifier.weight(1f)) {
                                 MenuItemCard(item = menuItem, onClick = {
-                                    navController.navigate(Screen.MenuItemDetail.createRoute(menuItem.id))
+                                    navController.navigate(
+                                        Screen.MenuItemDetail.createRoute(
+                                            menuItem.id
+                                        )
+                                    )
                                 })
                             }
                         }
