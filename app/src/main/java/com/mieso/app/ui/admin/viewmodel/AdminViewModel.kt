@@ -42,6 +42,7 @@ data class AddEditBannerUiState(
     val isSaving: Boolean = false
 )
 
+
 @HiltViewModel
 class AdminViewModel @Inject constructor(
     private val homeRepository: HomeRepository,
@@ -59,6 +60,7 @@ class AdminViewModel @Inject constructor(
 
     private val _saveResult = MutableSharedFlow<Result<String>>()
     val saveResult = _saveResult.asSharedFlow()
+
     val menuItems: StateFlow<List<MenuItem>> =
         homeRepository.getAllMenuItemsStream()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
@@ -72,22 +74,16 @@ class AdminViewModel @Inject constructor(
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     init {
+        // Correctly collect the stream of categories.
         viewModelScope.launch {
-            _categories.value = homeRepository.getCategories()
+            homeRepository.getCategoriesStream().collect { categoryList ->
+                _categories.value = categoryList
+            }
         }
     }
 
-
-    /**
-     * Triggers an update for an order's status.
-     * This function will be called from the UI when an admin confirms a status change.
-     * @param orderId The ID of the order to be updated.
-     * @param newStatus The new status to be set for the order.
-     */
     fun updateOrderStatus(orderId: String, newStatus: String) {
-        // Memastikan orderId tidak kosong untuk mencegah error.
         if (orderId.isBlank()) return
-
         viewModelScope.launch {
             orderRepository.updateOrderStatus(orderId, newStatus)
         }
@@ -110,6 +106,10 @@ class AdminViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    fun prepareNewMenuItem() {
+        _addEditScreenUiState.value = AddEditScreenUiState()
     }
 
     fun onNameChanged(name: String) = _addEditScreenUiState.update { it.copy(name = name) }
@@ -195,14 +195,9 @@ class AdminViewModel @Inject constructor(
         }
     }
 
-    fun prepareNewMenuItem() {
-        _addEditScreenUiState.value = AddEditScreenUiState()
-    }
-
     fun prepareNewBanner() {
         _addEditBannerUiState.value = AddEditBannerUiState()
     }
-
 
     fun onBannerOrderChanged(order: String) =
         _addEditBannerUiState.update { it.copy(order = order) }

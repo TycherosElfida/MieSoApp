@@ -69,7 +69,7 @@ fun HomeScreen(
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = 16.dp),
-        userScrollEnabled = !uiState.isLoading // Disable scroll while shimmering
+        userScrollEnabled = !uiState.isLoading
     ) {
         if (uiState.isLoading) {
             // Shimmering UI when loading
@@ -86,7 +86,7 @@ fun HomeScreen(
                 FullScreenError(
                     modifier = Modifier.fillParentMaxSize(),
                     message = uiState.error ?: "Gagal memuat data.",
-                    onRetry = { viewModel.loadHomeScreenData() }
+                    onRetry = { viewModel.onRetry() } // Correctly call the new retry function
                 )
             }
         } else {

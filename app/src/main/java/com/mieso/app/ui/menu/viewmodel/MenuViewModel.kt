@@ -9,6 +9,7 @@ import com.mieso.app.ui.navigation.NavArguments
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -36,22 +37,22 @@ class MenuViewModel @Inject constructor(
     }
 
     private fun loadMenuItems(categoryId: String) {
-        _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
-            try {
-                val items = homeRepository.getMenuItemsByCategory(categoryId)
-
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        menuItems = items,
-                        error = null
-                    )
+            _uiState.update { it.copy(isLoading = true) }
+            homeRepository.getMenuItemsByCategoryStream(categoryId)
+                .catch { e ->
+                    _uiState.update { it.copy(isLoading = false, error = "Failed to load menu.") }
+                    e.printStackTrace()
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                _uiState.update { it.copy(isLoading = false, error = "Failed to load menu.") }
-            }
+                .collect { items ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            menuItems = items,
+                            error = null
+                        )
+                    }
+                }
         }
     }
 }

@@ -11,18 +11,21 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
+/**
+ * Implementation of HomeRepository using Firestore as the data source.
+ * This version is refactored to use real-time snapshot listeners for data streams.
+ */
 class HomeRepositoryImpl @Inject constructor(
     private val firestore: FirebaseFirestore
 ) : HomeRepository {
 
-    override suspend fun getPromoBanners(): List<PromoBanner> {
-        return try {
-            firestore.collection("promoBanners")
-                .orderBy("order", Query.Direction.ASCENDING)
-                .get().await().toObjects(PromoBanner::class.java)
-        } catch (e: Exception) {
-            emptyList()
-        }
+    /* --- Real-Time Data Stream Implementations --- */
+
+    override fun getPromoBannersStream(): Flow<List<PromoBanner>> {
+        return firestore.collection("promoBanners")
+            .orderBy("order", Query.Direction.ASCENDING)
+            .snapshots()
+            .map { snapshot -> snapshot.toObjects(PromoBanner::class.java) }
     }
 
     override fun getCategoriesStream(): Flow<List<FoodCategory>> {
@@ -40,32 +43,6 @@ class HomeRepositoryImpl @Inject constructor(
             .map { snapshot -> snapshot.toObjects(MenuItem::class.java) }
     }
 
-    override suspend fun getMenuItemsByCategory(categoryId: String): List<MenuItem> {
-        return try {
-            firestore.collection("menuItems")
-                .whereEqualTo("categoryId", categoryId)
-                .get()
-                .await()
-                .toObjects(MenuItem::class.java)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            emptyList()
-        }
-    }
-
-    override suspend fun getMenuItemById(menuItemId: String): MenuItem? {
-        return try {
-            firestore.collection("menuItems")
-                .document(menuItemId)
-                .get()
-                .await()
-                .toObject(MenuItem::class.java)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        }
-    }
-
     override fun getAllMenuItemsStream(): Flow<List<MenuItem>> {
         return firestore.collection("menuItems")
             .orderBy("name")
@@ -73,26 +50,70 @@ class HomeRepositoryImpl @Inject constructor(
             .map { snapshot -> snapshot.toObjects(MenuItem::class.java) }
     }
 
+    override fun getMenuItemsByCategoryStream(categoryId: String): Flow<List<MenuItem>> {
+        return firestore.collection("menuItems")
+            .whereEqualTo("categoryId", categoryId)
+            .snapshots()
+            .map { snapshot -> snapshot.toObjects(MenuItem::class.java) }
+    }
+
+
+    /* --- One-Time Fetch Implementations --- */
+
+    override suspend fun getMenuItemById(menuItemId: String): MenuItem? {
+        return try {
+            firestore.collection("menuItems").document(menuItemId).get().await()
+                .toObject(MenuItem::class.java)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    override suspend fun getPromoBannerById(bannerId: String): PromoBanner? {
+        return try {
+            firestore.collection("promoBanners").document(bannerId).get().await()
+                .toObject(PromoBanner::class.java)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
 
     override suspend fun searchMenuItems(query: String): List<MenuItem> {
         if (query.isBlank()) {
             return emptyList()
         }
         return try {
-            // Ambil semua item menu. Untuk aplikasi skala besar, pertimbangkan
-            // layanan pencarian pihak ketiga seperti Algolia atau Elasticsearch.
-            val allItems = firestore.collection("menuItems")
-                .get()
-                .await()
-                .toObjects(MenuItem::class.java)
-
-            // Filter di sisi klien dengan case-insensitive
+            val allItems =
+                firestore.collection("menuItems").get().await().toObjects(MenuItem::class.java)
             allItems.filter { menuItem ->
                 menuItem.name.contains(query, ignoreCase = true)
             }
         } catch (e: Exception) {
             e.printStackTrace()
             emptyList()
+        }
+    }
+
+
+    /* --- Data Mutation Implementations (Admin) --- */
+
+    override suspend fun addMenuItem(menuItem: MenuItem) {
+        try {
+            val newDocRef = firestore.collection("menuItems").document()
+            newDocRef.set(menuItem.copy(id = newDocRef.id)).await()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    override suspend fun updateMenuItem(menuItem: MenuItem) {
+        try {
+            if (menuItem.id.isBlank()) return
+            firestore.collection("menuItems").document(menuItem.id).set(menuItem).await()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
@@ -104,32 +125,10 @@ class HomeRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun addMenuItem(menuItem: MenuItem) {
-        try {
-            val newMenuItemRef = firestore.collection("menuItems").document()
-            val menuItemWithId = menuItem.copy(id = newMenuItemRef.id)
-            newMenuItemRef.set(menuItemWithId).await()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
-    override suspend fun updateMenuItem(menuItem: MenuItem) {
-        try {
-            if (menuItem.id.isBlank()) {
-                throw IllegalArgumentException("MenuItem ID cannot be blank for update.")
-            }
-            firestore.collection("menuItems").document(menuItem.id).set(menuItem).await()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
     override suspend fun addCategory(category: FoodCategory) {
         try {
-            val newCategoryRef = firestore.collection("categories").document()
-            val categoryWithId = category.copy(id = newCategoryRef.id)
-            newCategoryRef.set(categoryWithId).await()
+            val newDocRef = firestore.collection("categories").document()
+            newDocRef.set(category.copy(id = newDocRef.id)).await()
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -152,28 +151,10 @@ class HomeRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getPromoBannersStream(): Flow<List<PromoBanner>> {
-        return firestore.collection("promoBanners")
-            .orderBy("order", Query.Direction.ASCENDING)
-            .snapshots()
-            .map { snapshot -> snapshot.toObjects(PromoBanner::class.java) }
-    }
-
-    override suspend fun getPromoBannerById(bannerId: String): PromoBanner? {
-        return try {
-            firestore.collection("promoBanners").document(bannerId).get().await()
-                .toObject(PromoBanner::class.java)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        }
-    }
-
     override suspend fun addPromoBanner(banner: PromoBanner) {
         try {
-            val newBannerRef = firestore.collection("promoBanners").document()
-            val bannerWithId = banner.copy(id = newBannerRef.id)
-            newBannerRef.set(bannerWithId).await()
+            val newDocRef = firestore.collection("promoBanners").document()
+            newDocRef.set(banner.copy(id = newDocRef.id)).await()
         } catch (e: Exception) {
             e.printStackTrace()
         }
