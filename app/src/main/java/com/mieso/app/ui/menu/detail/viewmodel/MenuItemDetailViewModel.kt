@@ -52,10 +52,4 @@ class MenuItemDetailViewModel @Inject constructor(
         }
     }
 
-    fun onAddToCartClicked() {
-        // TODO: Implement cart logic. This would typically involve
-        // a CartRepository or a CartManager to add the current item
-        // with its selected quantity and options.
-        println("Add to cart: ${_uiState.value.quantity}x ${_uiState.value.menuItem?.name}")
-    }
 }

@@ -9,7 +9,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
-import com.mieso.app.ui.admin.*
+import com.mieso.app.ui.admin.AddEditMenuItemScreen
+import com.mieso.app.ui.admin.AddEditPromoBannerScreen
+import com.mieso.app.ui.admin.AdminCategoriesScreen
+import com.mieso.app.ui.admin.AdminDashboardScreen
+import com.mieso.app.ui.admin.AdminManageOrdersScreen
+import com.mieso.app.ui.admin.AdminMenuScreen
+import com.mieso.app.ui.admin.AdminPromoBannersScreen
 import com.mieso.app.ui.admin.viewmodel.AdminViewModel
 import com.mieso.app.ui.cart.CartScreen
 import com.mieso.app.ui.checkout.AddAddressScreen
@@ -75,15 +81,12 @@ fun AppNavigation(navController: NavHostController) {
             }
         }
 
-        // --- Grafik Navigasi Admin (PERBAIKAN) ---
+        // --- Grafik Navigasi Admin ---
         navigation(
             startDestination = Screen.AdminDashboard.route,
             route = AdminGraph.route
         ) {
-            composable(Screen.AdminDashboard.route) { backStackEntry ->
-                val parentEntry = remember(backStackEntry) { navController.getBackStackEntry(AdminGraph.route) }
-                val adminViewModel: AdminViewModel = hiltViewModel(parentEntry)
-                AdminDashboardScreen(navController = navController)
+            composable(Screen.AdminDashboard.route) { AdminDashboardScreen(navController = navController)
             }
             composable(Screen.AdminManageOrders.route) { backStackEntry ->
                 val parentEntry = remember(backStackEntry) { navController.getBackStackEntry(AdminGraph.route) }

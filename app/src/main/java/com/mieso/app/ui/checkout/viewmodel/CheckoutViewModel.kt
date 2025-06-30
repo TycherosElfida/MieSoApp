@@ -12,7 +12,11 @@ import com.mieso.app.data.repository.UserRepository
 import com.mieso.app.ui.checkout.state.CheckoutUiState
 import com.mieso.app.ui.checkout.state.ServiceType
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
