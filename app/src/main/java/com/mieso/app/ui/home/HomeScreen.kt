@@ -230,7 +230,7 @@ fun PromoBanners(banners: List<PromoBanner>) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp),
-                shape = RoundedCornerShape(16.dp)
+                shape = MaterialTheme.shapes.large
             ) {
                 AsyncImage(
                     model = banners[page].imageUrl,
@@ -333,7 +333,7 @@ fun MenuItemCard(
     Card(
         onClick = onClick,
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
+        shape = MaterialTheme.shapes.medium,
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
@@ -422,7 +422,7 @@ private fun ShimmerPromoBanners() {
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .fillMaxWidth()
             .height(150.dp)
-            .clip(RoundedCornerShape(16.dp))
+            .clip(MaterialTheme.shapes.large)
             .background(Color.Gray)
             .shimmer()
     )
@@ -442,7 +442,7 @@ private fun ShimmerCategoryChips() {
                 modifier = Modifier
                     .width(100.dp)
                     .height(40.dp)
-                    .clip(RoundedCornerShape(8.dp))
+                    .clip(MaterialTheme.shapes.small)
                     .background(Color.Gray)
             )
         }

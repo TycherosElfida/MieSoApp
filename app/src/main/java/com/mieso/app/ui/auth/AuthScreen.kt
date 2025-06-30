@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -182,7 +181,7 @@ private fun AuthHeader() {
             contentDescription = "App Logo",
             modifier = Modifier
                 .size(100.dp)
-                .clip(RoundedCornerShape(24.dp))
+                .clip(MaterialTheme.shapes.extraLarge)
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
@@ -223,7 +222,7 @@ private fun AuthForm(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             isError = state.emailError != null,
             singleLine = true,
-            shape = RoundedCornerShape(12.dp)
+            shape = MaterialTheme.shapes.medium
         )
         if (state.emailError != null) {
             Text(
@@ -252,7 +251,7 @@ private fun AuthForm(
                     Icon(imageVector = image, contentDescription = "Toggle password visibility")
                 }
             },
-            shape = RoundedCornerShape(12.dp)
+            shape = MaterialTheme.shapes.medium
         )
         if (state.passwordError != null) {
             Text(
@@ -273,7 +272,7 @@ private fun AuthForm(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp),
-            shape = RoundedCornerShape(12.dp)
+            shape = MaterialTheme.shapes.medium
         ) {
             if (isLoading) {
                 CircularProgressIndicator(
@@ -349,7 +348,7 @@ private fun GoogleSignInButton(isLoading: Boolean, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .height(50.dp),
-        shape = RoundedCornerShape(12.dp),
+        shape = MaterialTheme.shapes.medium,
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
     ) {
         if (isLoading) {
