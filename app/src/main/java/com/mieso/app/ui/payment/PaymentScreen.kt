@@ -212,7 +212,13 @@ private fun PaymentSummarySection(subtotal: Long, deliveryFee: Long, total: Long
     Card {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             SummaryRow(label = "Subtotal", value = formatToRupiah(subtotal))
-            SummaryRow(label = "Ongkos Kirim", value = formatToRupiah(deliveryFee))
+
+            // --- TAMBAHKAN KONDISI INI ---
+            // Baris ini hanya akan muncul jika ada ongkos kirim
+            if (deliveryFee > 0) {
+                SummaryRow(label = "Ongkos Kirim", value = formatToRupiah(deliveryFee))
+            }
+
             HorizontalDivider(Modifier.padding(vertical = 8.dp))
             SummaryRow(label = "Total Pembayaran", value = formatToRupiah(total), isTotal = true)
         }

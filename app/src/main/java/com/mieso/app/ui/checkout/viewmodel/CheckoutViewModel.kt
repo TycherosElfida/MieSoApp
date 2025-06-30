@@ -33,23 +33,17 @@ class CheckoutViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     init {
-        // Langkah 1: Ambil daftar alamat yang tersimpan satu kali saja.
         loadInitialAddresses()
-
-        // Langkah 2: Pantau perubahan pada keranjang untuk memperbarui harga.
-        // Flow ini tidak akan lagi mengganggu daftar alamat.
         viewModelScope.launch {
             cartRepository.getCartItems().collect { cartItems ->
                 _uiState.update { currentState ->
                     val subtotal = cartItems.sumOf { it.menuItem.price * it.quantity }
-                    val deliveryFee =
-                        if (currentState.selectedAddress != null) currentState.deliveryFee else 0L
-                    val total = subtotal + deliveryFee
+                    // Recalculate total whenever cart changes
+                    val newTotal = subtotal + currentState.deliveryFee
                     currentState.copy(
                         cartItems = cartItems,
                         subtotal = subtotal,
-                        deliveryFee = deliveryFee,
-                        total = total
+                        total = newTotal
                     )
                 }
             }
@@ -60,11 +54,9 @@ class CheckoutViewModel @Inject constructor(
         viewModelScope.launch {
             val userId = userDataProvider.user.value?.id
             if (userId == null) {
-                // Handle jika user tidak ditemukan
                 _uiState.update { it.copy(error = "User not logged in.") }
                 return@launch
             }
-            // Ambil alamat dari database dan set sebagai state awal
             val addresses = userRepository.getUserAddresses(userId).first()
             _uiState.update {
                 it.copy(
@@ -76,7 +68,61 @@ class CheckoutViewModel @Inject constructor(
         }
     }
 
-    // Fungsi ini tidak berubah dari perbaikan sebelumnya, sudah benar.
+    // --- PERBAIKAN LOGIKA UTAMA ADA DI FUNGSI INI ---
+    fun onServiceTypeSelected(serviceType: ServiceType) {
+        _uiState.update { currentState ->
+            // Tentukan ongkos kirim berdasarkan tipe layanan
+            val deliveryFee = when (serviceType) {
+                ServiceType.DELIVERY -> currentState.deliveryFee // Gunakan nilai default dari state
+                else -> 0L // Gratis untuk Dine-In atau Take Away
+            }
+            // Hitung ulang total harga
+            val total = currentState.subtotal + deliveryFee
+
+            currentState.copy(
+                selectedServiceType = serviceType,
+                deliveryFee = deliveryFee,
+                total = total
+            )
+        }
+    }
+
+    fun onAddressSelected(address: UserAddress) {
+        _uiState.update { it.copy(selectedAddress = address) }
+    }
+
+
+    fun placeOrder() {
+        viewModelScope.launch {
+            val user = userDataProvider.user.value
+            val currentState = _uiState.value
+            if (currentState.isPlacingOrder || currentState.cartItems.isEmpty() || user == null) {
+                _uiState.update { it.copy(orderPlacementResult = Result.failure(Exception("User not logged in or cart is empty."))) }
+                return@launch
+            }
+
+            _uiState.update { it.copy(isPlacingOrder = true) }
+
+            val order = Order(
+                userId = user.id,
+                items = currentState.cartItems,
+                shippingAddress = if (currentState.selectedServiceType == ServiceType.DELIVERY) currentState.selectedAddress else null,
+                subtotal = currentState.subtotal,
+                deliveryFee = currentState.deliveryFee,
+                total = currentState.total
+            )
+
+            val result = orderRepository.placeOrder(order)
+            if (result.isSuccess) {
+                cartRepository.clearCart()
+            }
+
+            _uiState.update {
+                it.copy(isPlacingOrder = false, orderPlacementResult = result)
+            }
+        }
+    }
+
     fun fetchCurrentLocationAsAddress() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
@@ -110,61 +156,6 @@ class CheckoutViewModel @Inject constructor(
         }
     }
 
-    // Fungsi onAddressSelected sekarang juga perlu memperbarui harga
-    fun onAddressSelected(address: UserAddress) {
-        _uiState.update { currentState ->
-            val deliveryFee =
-                if (address.label == "Lokasi Saat Ini" || address.id.isNotBlank()) currentState.deliveryFee else 0L
-            val total = currentState.subtotal + deliveryFee
-            currentState.copy(
-                selectedAddress = address,
-                deliveryFee = deliveryFee,
-                total = total
-            )
-        }
-    }
-
-    // --- Sisa fungsi lainnya tidak perlu diubah ---
-
-    fun placeOrder() {
-        viewModelScope.launch {
-            val user = userDataProvider.user.value
-            val currentState = _uiState.value
-            if (currentState.isPlacingOrder || currentState.cartItems.isEmpty() || user == null) {
-                _uiState.update { it.copy(orderPlacementResult = Result.failure(Exception("User not logged in or cart is empty."))) }
-                return@launch
-            }
-
-            _uiState.update { it.copy(isPlacingOrder = true) }
-
-            val order = Order(
-                userId = user.id,
-                items = currentState.cartItems,
-                shippingAddress = currentState.selectedAddress,
-                subtotal = currentState.subtotal,
-                deliveryFee = currentState.deliveryFee,
-                total = currentState.total
-            )
-
-            val result = orderRepository.placeOrder(order)
-            if (result.isSuccess) {
-                cartRepository.clearCart()
-            }
-
-            _uiState.update {
-                it.copy(isPlacingOrder = false, orderPlacementResult = result)
-            }
-        }
-    }
-
-    fun consumeOrderPlacementResult() {
-        _uiState.update { it.copy(orderPlacementResult = null) }
-    }
-
-    fun onServiceTypeSelected(serviceType: ServiceType) {
-        _uiState.update { it.copy(selectedServiceType = serviceType) }
-    }
-
     fun saveNewAddress(
         label: String,
         addressLine1: String,
@@ -172,36 +163,26 @@ class CheckoutViewModel @Inject constructor(
         postalCode: String
     ) {
         viewModelScope.launch {
-            // Tampilkan indikator loading agar pengguna tahu ada proses berjalan
             _uiState.update { it.copy(isLoading = true) }
-
             val userId = userDataProvider.user.value?.id
             if (userId == null) {
                 _uiState.update { it.copy(isLoading = false, error = "User not found.") }
                 return@launch
             }
-
             val newAddress = UserAddress(
                 label = label,
                 addressLine1 = addressLine1,
                 city = city,
                 postalCode = postalCode,
-                // Jadikan alamat utama jika ini adalah alamat pertama
                 isPrimary = _uiState.value.userAddresses.isEmpty()
             )
-
-            // Simpan ke database
             userRepository.addAddress(userId, newAddress)
-
-            // ==========================================================
-            // ===             INILAH BAGIAN PERBAIKANNYA             ===
-            // ==========================================================
-            // Setelah berhasil menyimpan, panggil lagi fungsi untuk memuat
-            // daftar alamat agar UI diperbarui dengan data terbaru.
             loadInitialAddresses()
-
-            // Sembunyikan kembali indikator loading
             _uiState.update { it.copy(isLoading = false) }
         }
+    }
+
+    fun consumeOrderPlacementResult() {
+        _uiState.update { it.copy(orderPlacementResult = null) }
     }
 }
