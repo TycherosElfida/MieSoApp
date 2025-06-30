@@ -1,8 +1,5 @@
-// File: app/src/main/java/com/mieso/app/ui/admin/viewmodel/AdminViewModel.kt
-
 package com.mieso.app.ui.admin.viewmodel
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mieso.app.data.model.FoodCategory
@@ -12,16 +9,17 @@ import com.mieso.app.data.model.PromoBanner
 import com.mieso.app.data.repository.HomeRepository
 import com.mieso.app.data.repository.OrderRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-// ... data class tidak berubah ...
 data class AddEditScreenUiState(
     val id: String = "",
     val name: String = "",
@@ -44,17 +42,11 @@ data class AddEditBannerUiState(
     val isSaving: Boolean = false
 )
 
-
 @HiltViewModel
 class AdminViewModel @Inject constructor(
     private val homeRepository: HomeRepository,
     private val orderRepository: OrderRepository,
-    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-
-    // ... StateFlows dan init block yang sudah ada tidak berubah ...
-    private val menuItemId: String? = savedStateHandle["menuItemId"]
-    private val bannerId: String? = savedStateHandle["bannerId"]
 
     private val _addEditScreenUiState = MutableStateFlow(AddEditScreenUiState())
     val addEditScreenUiState = _addEditScreenUiState.asStateFlow()
@@ -65,6 +57,8 @@ class AdminViewModel @Inject constructor(
     private val _categories = MutableStateFlow<List<FoodCategory>>(emptyList())
     val categories: StateFlow<List<FoodCategory>> = _categories.asStateFlow()
 
+    private val _saveResult = MutableSharedFlow<Result<String>>()
+    val saveResult = _saveResult.asSharedFlow()
     val menuItems: StateFlow<List<MenuItem>> =
         homeRepository.getAllMenuItemsStream()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
@@ -81,16 +75,9 @@ class AdminViewModel @Inject constructor(
         viewModelScope.launch {
             _categories.value = homeRepository.getCategories()
         }
-        if (menuItemId != null) {
-            loadMenuItem(menuItemId)
-        }
-        if (bannerId != null) {
-            loadPromoBanner(bannerId)
-        }
     }
 
 
-    // --- TAMBAHKAN FUNGSI BARU DI BAWAH INI ---
     /**
      * Triggers an update for an order's status.
      * This function will be called from the UI when an admin confirms a status change.
@@ -102,16 +89,11 @@ class AdminViewModel @Inject constructor(
         if (orderId.isBlank()) return
 
         viewModelScope.launch {
-            // Memanggil fungsi dari repository.
-            // Kita tidak perlu menangani hasilnya di sini karena UI akan otomatis
-            // diperbarui oleh StateFlow `allOrders` saat data di Firestore berubah.
             orderRepository.updateOrderStatus(orderId, newStatus)
         }
     }
 
-
-    // --- Sisa fungsi-fungsi ViewModel tidak berubah ---
-    private fun loadMenuItem(id: String) {
+    fun loadMenuItemForEdit(id: String) {
         viewModelScope.launch {
             val item = homeRepository.getMenuItemById(id)
             if (item != null) {
@@ -161,12 +143,18 @@ class AdminViewModel @Inject constructor(
                 isRecommended = state.isRecommended,
                 imageUrl = state.imageUrl
             )
-            if (state.isEditing) {
-                homeRepository.updateMenuItem(menuItem)
-            } else {
-                homeRepository.addMenuItem(menuItem)
+            try {
+                if (state.isEditing) {
+                    homeRepository.updateMenuItem(menuItem)
+                } else {
+                    homeRepository.addMenuItem(menuItem)
+                }
+                _saveResult.emit(Result.success("Menu item saved successfully!"))
+            } catch (e: Exception) {
+                _saveResult.emit(Result.failure(e))
+            } finally {
+                _addEditScreenUiState.update { it.copy(isSaving = false) }
             }
-            _addEditScreenUiState.update { it.copy(isSaving = false) }
         }
     }
 
@@ -192,7 +180,7 @@ class AdminViewModel @Inject constructor(
         viewModelScope.launch { homeRepository.deleteCategory(categoryId) }
     }
 
-    private fun loadPromoBanner(id: String) {
+    fun loadPromoBannerForEdit(id: String) {
         viewModelScope.launch {
             val banner = homeRepository.getPromoBannerById(id)
             if (banner != null) {
@@ -206,6 +194,15 @@ class AdminViewModel @Inject constructor(
             }
         }
     }
+
+    fun prepareNewMenuItem() {
+        _addEditScreenUiState.value = AddEditScreenUiState()
+    }
+
+    fun prepareNewBanner() {
+        _addEditBannerUiState.value = AddEditBannerUiState()
+    }
+
 
     fun onBannerOrderChanged(order: String) =
         _addEditBannerUiState.update { it.copy(order = order) }
@@ -226,12 +223,18 @@ class AdminViewModel @Inject constructor(
                 targetScreen = state.targetScreen,
                 imageUrl = state.imageUrl
             )
-            if (state.isEditing) {
-                homeRepository.updatePromoBanner(banner)
-            } else {
-                homeRepository.addPromoBanner(banner)
+            try {
+                if (state.isEditing) {
+                    homeRepository.updatePromoBanner(banner)
+                } else {
+                    homeRepository.addPromoBanner(banner)
+                }
+                _saveResult.emit(Result.success("Banner saved successfully!"))
+            } catch (e: Exception) {
+                _saveResult.emit(Result.failure(e))
+            } finally {
+                _addEditBannerUiState.update { it.copy(isSaving = false) }
             }
-            _addEditBannerUiState.update { it.copy(isSaving = false) }
         }
     }
 

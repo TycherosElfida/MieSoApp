@@ -1,6 +1,9 @@
 package com.mieso.app.ui.profile
 
 import android.Manifest
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
@@ -29,15 +32,23 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -45,6 +56,7 @@ import androidx.navigation.NavController
 import com.mieso.app.data.model.UserAddress
 import com.mieso.app.ui.checkout.viewmodel.CheckoutViewModel
 import com.mieso.app.ui.navigation.Screen
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,6 +65,11 @@ fun ManageAddressesScreen(
     viewModel: CheckoutViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+
+    var selectedAddressId by remember { mutableStateOf<String?>(null) }
 
     val locationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
@@ -60,7 +77,19 @@ fun ManageAddressesScreen(
             if (isGranted) {
                 viewModel.fetchCurrentLocationAsAddress()
             } else {
-                // TODO: Tampilkan pesan bahwa izin lokasi ditolak
+                scope.launch {
+                    val result = snackbarHostState.showSnackbar(
+                        message = "Izin lokasi diperlukan untuk menggunakan fitur ini.",
+                        actionLabel = "Setelan",
+                        withDismissAction = true
+                    )
+                    if (result == SnackbarResult.ActionPerformed) {
+                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                            data = Uri.fromParts("package", context.packageName, null)
+                        }
+                        context.startActivity(intent)
+                    }
+                }
             }
         }
     )
@@ -75,8 +104,8 @@ fun ManageAddressesScreen(
                     }
                 }
             )
-        }
-        // Tidak ada bottomBar, karena tombol kembali sudah ada di TopAppBar
+        },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { paddingValues ->
         LazyColumn(
             modifier = Modifier
@@ -113,9 +142,9 @@ fun ManageAddressesScreen(
             items(uiState.userAddresses, key = { it.id }) { address ->
                 AddressCard(
                     address = address,
-                    isSelected = false,
+                    isSelected = selectedAddressId == address.id,
                     onClick = {
-                        // Di masa depan, ini bisa diarahkan ke halaman edit alamat
+                        selectedAddressId = address.id
                     }
                 )
             }

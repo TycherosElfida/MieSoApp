@@ -135,7 +135,15 @@ fun AppNavigation(navController: NavHostController) {
                 val parentEntry =
                     remember(backStackEntry) { navController.getBackStackEntry(AdminGraph.route) }
                 val adminViewModel: AdminViewModel = hiltViewModel(parentEntry)
-                AddEditMenuItemScreen(navController = navController, viewModel = adminViewModel)
+
+                // Extract the argument and pass it to the screen
+                val menuItemId = backStackEntry.arguments?.getString("menuItemId")
+
+                AddEditMenuItemScreen(
+                    navController = navController,
+                    menuItemId = menuItemId,
+                    viewModel = adminViewModel
+                )
             }
             composable(
                 route = Screen.AddEditPromoBanner.route,
@@ -146,7 +154,14 @@ fun AppNavigation(navController: NavHostController) {
                 val parentEntry =
                     remember(backStackEntry) { navController.getBackStackEntry(AdminGraph.route) }
                 val adminViewModel: AdminViewModel = hiltViewModel(parentEntry)
-                AddEditPromoBannerScreen(navController = navController, viewModel = adminViewModel)
+
+                val bannerId = backStackEntry.arguments?.getString("bannerId")
+
+                AddEditPromoBannerScreen(
+                    navController = navController,
+                    bannerId = bannerId,
+                    viewModel = adminViewModel
+                )
             }
         }
 

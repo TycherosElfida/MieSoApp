@@ -1,6 +1,9 @@
 package com.mieso.app.ui.checkout
 
 import android.Manifest
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
@@ -30,15 +33,21 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -46,6 +55,7 @@ import androidx.navigation.NavController
 import com.mieso.app.data.model.UserAddress
 import com.mieso.app.ui.checkout.viewmodel.CheckoutViewModel
 import com.mieso.app.ui.navigation.Screen
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,16 +64,32 @@ fun DeliveryDetailsScreen(
     viewModel: CheckoutViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     val locationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { isGranted ->
             if (isGranted) {
-                // *** PERMISSION GRANTED: Call the ViewModel to fetch location ***
+                // PERMISSION GRANTED: Call the ViewModel to fetch location
                 viewModel.fetchCurrentLocationAsAddress()
             } else {
-                // TODO: Show a user-friendly message explaining why the feature is unavailable
-                // without the permission. For example, using a Snackbar.
+                // Show a user-friendly message explaining why the feature is unavailable
+                scope.launch {
+                    val result = snackbarHostState.showSnackbar(
+                        message = "Location permission is needed to use this feature.",
+                        actionLabel = "Settings",
+                        withDismissAction = true
+                    )
+                    if (result == SnackbarResult.ActionPerformed) {
+                        // User clicked the "Settings" action. Open app settings.
+                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                            data = Uri.fromParts("package", context.packageName, null)
+                        }
+                        context.startActivity(intent)
+                    }
+                }
             }
         }
     )
@@ -79,6 +105,7 @@ fun DeliveryDetailsScreen(
                 }
             )
         },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         bottomBar = {
             Button(
                 onClick = { navController.navigate(Screen.Payment.route) },

@@ -1,12 +1,11 @@
 package com.mieso.app.data.model
 
 import com.google.firebase.firestore.DocumentId
-import com.google.firebase.firestore.Exclude // <-- TAMBAHKAN IMPORT INI
+import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.ServerTimestamp
 import java.util.Date
 
 data class Order(
-    // --- PERUBAHAN UTAMA ADA DI SINI ---
     /**
      * @DocumentId: Otomatis diisi dengan ID dokumen dari Firestore saat dibaca.
      * @get:Exclude: Mencegah properti ini ditulis sebagai field di dalam dokumen Firestore.

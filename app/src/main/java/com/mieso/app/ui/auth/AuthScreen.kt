@@ -319,7 +319,6 @@ private fun ToggleAuthModeText(authMode: AuthMode, onToggle: () -> Unit) {
             append(if (authMode == AuthMode.SIGN_IN) "Sign Up" else "Sign In")
         }
     }
-    @Suppress("Deprecation")
     ClickableText(
         text = annotatedString,
         onClick = { onToggle() },

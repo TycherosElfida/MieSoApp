@@ -34,19 +34,13 @@ class OrderRepositoryImpl @Inject constructor(
             }
     }
 
-
     override fun getAllOrders(): Flow<List<Order>> {
         return firestore.collection("orders")
             .orderBy("createdAt", Query.Direction.DESCENDING)
             .snapshots()
             .map { snapshot ->
-                // Alih-alih langsung ke .toObjects(), kita akan memproses setiap dokumen
-                // untuk memastikan ID-nya terpasang dengan benar.
                 snapshot.documents.mapNotNull { document ->
-                    // Konversi dokumen ke data class Order
                     val order = document.toObject(Order::class.java)
-                    // Secara manual menetapkan ID dokumen ke properti 'id' di data class.
-                    // Ini memastikan bahwa 'id' selalu berisi ID dokumen yang sebenarnya.
                     order?.apply {
                         id = document.id
                     }

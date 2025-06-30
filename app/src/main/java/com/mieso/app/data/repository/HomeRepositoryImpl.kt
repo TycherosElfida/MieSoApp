@@ -15,7 +15,6 @@ class HomeRepositoryImpl @Inject constructor(
     private val firestore: FirebaseFirestore
 ) : HomeRepository {
 
-    // ... (getPromoBanners, getCategories, getRecommendedItems functions remain the same)
     override suspend fun getPromoBanners(): List<PromoBanner> {
         return try {
             firestore.collection("promoBanners")
@@ -26,30 +25,25 @@ class HomeRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getCategories(): List<FoodCategory> {
-        return try {
-            firestore.collection("categories")
-                .orderBy("order", Query.Direction.ASCENDING)
-                .get().await().toObjects(FoodCategory::class.java)
-        } catch (e: Exception) {
-            emptyList()
-        }
+    override fun getCategoriesStream(): Flow<List<FoodCategory>> {
+        return firestore.collection("categories")
+            .orderBy("order", Query.Direction.ASCENDING)
+            .snapshots()
+            .map { snapshot -> snapshot.toObjects(FoodCategory::class.java) }
     }
 
-    override suspend fun getRecommendedItems(): List<MenuItem> {
-        return try {
-            firestore.collection("menuItems")
-                .whereEqualTo("isRecommended", true)
-                .limit(10).get().await().toObjects(MenuItem::class.java)
-        } catch (e: Exception) {
-            emptyList()
-        }
+    override fun getRecommendedItemsStream(): Flow<List<MenuItem>> {
+        return firestore.collection("menuItems")
+            .whereEqualTo("isRecommended", true)
+            .limit(10)
+            .snapshots()
+            .map { snapshot -> snapshot.toObjects(MenuItem::class.java) }
     }
 
     override suspend fun getMenuItemsByCategory(categoryId: String): List<MenuItem> {
         return try {
             firestore.collection("menuItems")
-                .whereEqualTo("categoryId", categoryId) // Query by the correct field: categoryId
+                .whereEqualTo("categoryId", categoryId)
                 .get()
                 .await()
                 .toObjects(MenuItem::class.java)
@@ -72,18 +66,13 @@ class HomeRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getAllMenuItems(): List<MenuItem> {
-        return try {
-            firestore.collection("menuItems")
-                .orderBy("name") // Urutkan berdasarkan nama untuk konsistensi
-                .get()
-                .await()
-                .toObjects(MenuItem::class.java)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            emptyList()
-        }
+    override fun getAllMenuItemsStream(): Flow<List<MenuItem>> {
+        return firestore.collection("menuItems")
+            .orderBy("name")
+            .snapshots()
+            .map { snapshot -> snapshot.toObjects(MenuItem::class.java) }
     }
+
 
     override suspend fun searchMenuItems(query: String): List<MenuItem> {
         if (query.isBlank()) {
@@ -107,15 +96,6 @@ class HomeRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getAllMenuItemsStream(): Flow<List<MenuItem>> {
-        return firestore.collection("menuItems")
-            .orderBy("name")
-            .snapshots()
-            .map { snapshot ->
-                snapshot.toObjects(MenuItem::class.java)
-            }
-    }
-
     override suspend fun deleteMenuItem(itemId: String) {
         try {
             firestore.collection("menuItems").document(itemId).delete().await()
@@ -124,35 +104,27 @@ class HomeRepositoryImpl @Inject constructor(
         }
     }
 
-    // THIS IS THE CRITICAL FIX for CREATING new menu items.
     override suspend fun addMenuItem(menuItem: MenuItem) {
         try {
-            // 1. Create a reference to a new, empty document in the 'menuItems' collection.
             val newMenuItemRef = firestore.collection("menuItems").document()
-            // 2. Explicitly set the ID in our object from the new document reference.
             val menuItemWithId = menuItem.copy(id = newMenuItemRef.id)
-            // 3. Use .set() to save the complete object to the new document reference.
             newMenuItemRef.set(menuItemWithId).await()
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
-    // THIS IS THE CRITICAL FIX for UPDATING existing menu items.
     override suspend fun updateMenuItem(menuItem: MenuItem) {
         try {
-            // Guard against trying to update an item without an ID.
             if (menuItem.id.isBlank()) {
                 throw IllegalArgumentException("MenuItem ID cannot be blank for update.")
             }
-            // Use .set() on a document reference that includes the specific ID.
             firestore.collection("menuItems").document(menuItem.id).set(menuItem).await()
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
-    // We will apply the same robust logic to categories and banners.
     override suspend fun addCategory(category: FoodCategory) {
         try {
             val newCategoryRef = firestore.collection("categories").document()
@@ -182,12 +154,11 @@ class HomeRepositoryImpl @Inject constructor(
 
     override fun getPromoBannersStream(): Flow<List<PromoBanner>> {
         return firestore.collection("promoBanners")
-            .orderBy("order")
+            .orderBy("order", Query.Direction.ASCENDING)
             .snapshots()
             .map { snapshot -> snapshot.toObjects(PromoBanner::class.java) }
     }
 
-    // v-- ADD THIS FUNCTION IMPLEMENTATION --v
     override suspend fun getPromoBannerById(bannerId: String): PromoBanner? {
         return try {
             firestore.collection("promoBanners").document(bannerId).get().await()
