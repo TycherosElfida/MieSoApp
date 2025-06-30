@@ -2,6 +2,15 @@ package com.mieso.app.ui.auth
 
 import android.widget.Toast
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -39,6 +48,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -58,7 +68,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mieso.app.R
 import com.mieso.app.data.common.Resource
+import kotlinx.coroutines.delay
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun AuthScreen(onSignInSuccess: () -> Unit) {
     val viewModel: AuthViewModel = hiltViewModel()
@@ -66,9 +78,17 @@ fun AuthScreen(onSignInSuccess: () -> Unit) {
     val context = LocalContext.current
     val authResult = state.authResult
 
+    var visible by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        visible = true
+    }
+
     LaunchedEffect(key1 = authResult) {
         if (authResult is Resource.Success) {
             Toast.makeText(context, "Sign in successful!", Toast.LENGTH_SHORT).show()
+            // Add a small delay for the user to see the success feedback if needed
+            delay(300)
             onSignInSuccess()
             viewModel.resetAuthResult()
         } else if (authResult is Resource.Error) {
@@ -90,26 +110,60 @@ fun AuthScreen(onSignInSuccess: () -> Unit) {
                 .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            AuthHeader()
-
-            AnimatedContent(
-                targetState = state.authMode,
-                label = "AuthFormAnimation"
-            ) { targetAuthMode ->
-                AuthForm(
-                    authMode = targetAuthMode,
-                    state = state,
-                    viewModel = viewModel
-                )
+            // Animated AuthHeader
+            AnimatedVisibility(
+                visible = visible,
+                enter = fadeIn(animationSpec = tween(durationMillis = 500)) +
+                        slideInVertically(
+                            initialOffsetY = { -it / 2 },
+                            animationSpec = tween(durationMillis = 500)
+                        )
+            ) {
+                AuthHeader()
             }
 
-            AuthDivider()
+            // Animated AuthForm container
+            AnimatedVisibility(
+                visible = visible,
+                enter = fadeIn(animationSpec = tween(durationMillis = 500, delayMillis = 200)) +
+                        slideInVertically(
+                            initialOffsetY = { it / 2 },
+                            animationSpec = tween(durationMillis = 500, delayMillis = 200)
+                        )
+            ) {
+                Column {
+                    AnimatedContent(
+                        targetState = state.authMode,
+                        label = "AuthFormAnimation",
+                        transitionSpec = {
+                            if (targetState == AuthMode.SIGN_IN) {
+                                slideInHorizontally(initialOffsetX = { -it }, animationSpec = tween(300)) +
+                                        fadeIn(animationSpec = tween(300)) togetherWith
+                                        slideOutHorizontally(targetOffsetX = { it }, animationSpec = tween(300)) +
+                                        fadeOut(animationSpec = tween(300))
+                            } else {
+                                slideInHorizontally(initialOffsetX = { it }, animationSpec = tween(300)) +
+                                        fadeIn(animationSpec = tween(300)) togetherWith
+                                        slideOutHorizontally(targetOffsetX = { -it }, animationSpec = tween(300)) +
+                                        fadeOut(animationSpec = tween(300))
+                            }
+                        }
+                    ) { targetAuthMode ->
+                        AuthForm(
+                            authMode = targetAuthMode,
+                            state = state,
+                            viewModel = viewModel
+                        )
+                    }
 
-            GoogleSignInButton(
-                isLoading = state.authResult is Resource.Loading,
-                onClick = viewModel::onGoogleSignInClick
-            )
+                    AuthDivider()
 
+                    GoogleSignInButton(
+                        isLoading = state.authResult is Resource.Loading,
+                        onClick = viewModel::onGoogleSignInClick
+                    )
+                }
+            }
             Spacer(modifier = Modifier.height(32.dp))
         }
     }
@@ -254,6 +308,7 @@ private fun ToggleAuthModeText(authMode: AuthMode, onToggle: () -> Unit) {
             append(if (authMode == AuthMode.SIGN_IN) "Sign Up" else "Sign In")
         }
     }
+    @Suppress("Deprecation")
     ClickableText(
         text = annotatedString,
         onClick = { onToggle() },
