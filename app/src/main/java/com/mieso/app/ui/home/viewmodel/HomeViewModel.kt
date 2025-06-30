@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val homeRepository: HomeRepository
+    homeRepository: HomeRepository
 ) : ViewModel() {
 
     // A trigger that we can use to manually re-initiate the data streams.
