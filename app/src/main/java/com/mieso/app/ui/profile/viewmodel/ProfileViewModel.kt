@@ -27,6 +27,8 @@ class ProfileViewModel @Inject constructor(
 
     private val _updateResult = MutableStateFlow<Result<Unit>?>(null)
     val updateResult = _updateResult.asStateFlow()
+    private val _isSaving = MutableStateFlow(false)
+    val isSaving = _isSaving.asStateFlow()
 
     fun signOut() {
         viewModelScope.launch {
@@ -36,6 +38,7 @@ class ProfileViewModel @Inject constructor(
 
     fun updateProfile(username: String, profilePictureUrl: String) {
         viewModelScope.launch {
+            _isSaving.value = true
             val userId = user.value?.id
             if (userId == null) {
                 _updateResult.value = Result.failure(Exception("User not found."))
@@ -57,6 +60,7 @@ class ProfileViewModel @Inject constructor(
                 )
                 userDataProvider.setUser(updatedUser)
             }
+            _isSaving.value = false
         }
     }
 

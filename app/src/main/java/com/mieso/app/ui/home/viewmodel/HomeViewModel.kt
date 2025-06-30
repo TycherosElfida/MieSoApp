@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val homeRepository: HomeRepository, // Hilt injects our repository here
+    private val homeRepository: HomeRepository,
     private val userDataProvider: UserDataProvider
 ) : ViewModel() {
 

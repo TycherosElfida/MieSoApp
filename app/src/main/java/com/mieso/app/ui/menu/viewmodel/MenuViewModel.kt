@@ -16,38 +16,35 @@ import javax.inject.Inject
 @HiltViewModel
 class MenuViewModel @Inject constructor(
     private val homeRepository: HomeRepository,
-    savedStateHandle: SavedStateHandle // Injected by Hilt to access navigation arguments.
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MenuUiState())
     val uiState = _uiState.asStateFlow()
 
-    // Retrieve the categoryId from the navigation arguments. This is the correct way.
     private val categoryId: String = savedStateHandle.get<String>(NavArguments.CATEGORY_ID) ?: ""
+    private val categoryName: String = savedStateHandle.get<String>(NavArguments.CATEGORY_NAME) ?: "Menu"
 
     init {
         if (categoryId.isNotEmpty()) {
-            loadMenuData(categoryId)
+            _uiState.update { it.copy(categoryTitle = categoryName) }
+            loadMenuItems(categoryId)
         } else {
             _uiState.update { it.copy(isLoading = false, error = "Category not found.") }
         }
     }
 
-    private fun loadMenuData(categoryId: String) {
-        // Set the UI to a loading state.
+    private fun loadMenuItems(categoryId: String) {
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             try {
                 val items = homeRepository.getMenuItemsByCategory(categoryId)
 
-                val title = if (items.isNotEmpty()) items.first().categoryName else "Menu"
-
                 _uiState.update {
                     it.copy(
                         isLoading = false,
                         menuItems = items,
-                        categoryTitle = title,
-                        error = null // Clear any previous errors
+                        error = null
                     )
                 }
             } catch (e: Exception) {

@@ -91,6 +91,7 @@ dependencies {
     /* ── Coil ── */
     implementation(libs.coil3.coil.compose)
     implementation(libs.coil.network.okhttp)
+    implementation(libs.shimmer)
 
     /* ── Identity / Credentials ── */
     implementation(libs.androidx.credentials)

@@ -58,7 +58,10 @@ fun AppNavigation(navController: NavHostController) {
         composable(Screen.Promo.route) { PromoScreen() }
         composable(
             route = Screen.Menu.route,
-            arguments = listOf(navArgument(NavArguments.CATEGORY_ID) { type = NavType.StringType })
+            arguments = listOf(
+                navArgument(NavArguments.CATEGORY_ID) { type = NavType.StringType },
+                navArgument(NavArguments.CATEGORY_NAME) { type = NavType.StringType }
+            )
         ) { MenuScreen(navController = navController) }
         composable(
             route = Screen.MenuItemDetail.route,

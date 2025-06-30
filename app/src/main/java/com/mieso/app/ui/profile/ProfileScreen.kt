@@ -44,6 +44,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -54,6 +55,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -76,6 +78,7 @@ fun ProfileScreen(
 ) {
     val user by viewModel.user.collectAsState()
     val updateResult by viewModel.updateResult.collectAsState()
+    val isSaving by viewModel.isSaving.collectAsState()
     var showLogoutDialog by remember { mutableStateOf(false) }
     var isEditing by remember { mutableStateOf(false) }
 
@@ -120,7 +123,8 @@ fun ProfileScreen(
             TopAppBar(
                 title = { Text("Profil Saya") },
                 actions = {
-                    if (user != null) {
+                    if (user != null && !isSaving) {
+                        val isDoneIcon = isEditing
                         IconButton(onClick = {
                             if (isEditing) {
                                 viewModel.updateProfile(username, profilePictureUrl)
@@ -129,48 +133,62 @@ fun ProfileScreen(
                             }
                         }) {
                             Icon(
-                                imageVector = if (isEditing) Icons.Default.Done else Icons.Default.Edit,
-                                contentDescription = if (isEditing) "Simpan" else "Edit"
+                                imageVector = if (isDoneIcon) Icons.Default.Done else Icons.Default.Edit,
+                                contentDescription = if (isDoneIcon) "Simpan" else "Edit"
                             )
                         }
+                    } else if (isSaving) {
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .size(24.dp)
+                                .padding(end = 8.dp),
+                            strokeWidth = 2.dp
+                        )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                )
             )
         }
     ) { paddingValues ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
+                .background(MaterialTheme.colorScheme.surface)
                 .padding(paddingValues)
         ) {
             item {
-                if (user == null) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
+                // Profile Header Section
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                ) {
+                    if (user == null) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 32.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
+                    } else {
+                        ProfileHeader(
+                            userData = user!!,
+                            isEditing = isEditing,
+                            username = username,
+                            profilePictureUrl = profilePictureUrl,
+                            onUsernameChange = { username = it },
+                            onProfilePictureUrlChange = { profilePictureUrl = it }
+                        )
                     }
-                } else {
-                    ProfileHeader(
-                        userData = user!!,
-                        isEditing = isEditing,
-                        username = username,
-                        profilePictureUrl = profilePictureUrl,
-                        onUsernameChange = { username = it },
-                        onProfilePictureUrlChange = { profilePictureUrl = it }
-                    )
                 }
             }
 
-            item {
-                HorizontalDivider(
-                    thickness = 8.dp,
-                    color = MaterialTheme.colorScheme.surfaceVariant
-                )
-            }
+            // Spacing between sections
+            item { Spacer(modifier = Modifier.height(16.dp)) }
 
             // Menu Akun
             item {
@@ -190,11 +208,8 @@ fun ProfileScreen(
 
             // Integrasi Admin Dashboard
             if (user?.role == "admin") {
+                item { Spacer(modifier = Modifier.height(16.dp)) }
                 item {
-                    HorizontalDivider(
-                        thickness = 8.dp,
-                        color = MaterialTheme.colorScheme.surfaceVariant
-                    )
                     ProfileMenuSection(title = "Panel Admin") {
                         ProfileMenuItem(
                             text = "Admin Dashboard",
@@ -205,12 +220,7 @@ fun ProfileScreen(
                 }
             }
 
-            item {
-                HorizontalDivider(
-                    thickness = 8.dp,
-                    color = MaterialTheme.colorScheme.surfaceVariant
-                )
-            }
+            item { Spacer(modifier = Modifier.height(16.dp)) }
 
             // Menu Informasi
             item {
@@ -228,12 +238,13 @@ fun ProfileScreen(
                     ProfileMenuItem(
                         text = "Kebijakan Privasi",
                         icon = Icons.Outlined.Shield,
+                        isLastItem = true,
                         onClick = { navController.navigate(Screen.PrivacyPolicy.route) }
                     )
                 }
             }
 
-            item { Spacer(modifier = Modifier.height(24.dp)) }
+            item { Spacer(modifier = Modifier.height(32.dp)) }
 
             item {
                 Box(modifier = Modifier.padding(horizontal = 16.dp)) {
@@ -310,7 +321,7 @@ private fun ProfileHeader(
             modifier = Modifier
                 .size(96.dp)
                 .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .background(MaterialTheme.colorScheme.surface)
         )
 
         if (isEditing) {
@@ -335,7 +346,7 @@ private fun ProfileHeader(
                     fontWeight = FontWeight.Bold
                 )
                 userData.email?.let { email ->
-                    Text(text = email)
+                    Text(text = email, style = MaterialTheme.typography.bodyMedium)
                 }
             }
         }
@@ -348,14 +359,22 @@ private fun ProfileMenuSection(
     title: String,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
         Text(
             text = title,
-            style = MaterialTheme.typography.titleSmall,
+            style = MaterialTheme.typography.labelLarge,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp)
+            modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp),
+            color = MaterialTheme.colorScheme.primary
         )
-        content()
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(MaterialTheme.shapes.large)
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+        ) {
+            content()
+        }
     }
 }
 
@@ -364,27 +383,32 @@ private fun ProfileMenuSection(
 private fun ProfileMenuItem(
     text: String,
     icon: ImageVector,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    isLastItem: Boolean = false
 ) {
-    ListItem(
-        modifier = Modifier.clickable(onClick = onClick),
-        headlineContent = { Text(text, style = MaterialTheme.typography.bodyLarge) },
-        leadingContent = {
-            Icon(
-                imageVector = icon,
-                contentDescription = text,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
+    Column {
+        ListItem(
+            modifier = Modifier.clickable(onClick = onClick),
+            headlineContent = { Text(text, style = MaterialTheme.typography.bodyLarge) },
+            leadingContent = {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = text,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            },
+            trailingContent = {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = null
+                )
+            },
+            colors = ListItemDefaults.colors(
+                containerColor = Color.Transparent
             )
-        },
-        trailingContent = {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = null
-            )
-        },
-        colors = ListItemDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surface
         )
-    )
-    HorizontalDivider(modifier = Modifier.padding(start = 16.dp, end = 16.dp))
+        if (!isLastItem) {
+            HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
+        }
+    }
 }

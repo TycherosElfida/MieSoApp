@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.mieso.app.ui.home
 
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -46,14 +48,17 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
+import com.mieso.app.data.model.FoodCategory
 import com.mieso.app.data.model.MenuItem
 import com.mieso.app.data.model.PromoBanner
 import com.mieso.app.ui.home.viewmodel.HomeViewModel
 import com.mieso.app.ui.navigation.Screen
+import com.valentinilk.shimmer.shimmer
 import kotlinx.coroutines.delay
 import java.text.NumberFormat
 import java.util.Locale
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreen(
     navController: NavHostController,
@@ -61,130 +66,94 @@ fun HomeScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    if (uiState.error != null) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text(text = uiState.error!!)
-        }
-        return
-    }
-
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(bottom = 16.dp)
+        contentPadding = PaddingValues(bottom = 16.dp),
+        userScrollEnabled = !uiState.isLoading // Disable scroll while shimmering
     ) {
-        item { WelcomeHeader() }
-        item {
-            Box(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .clickable { navController.navigate(Screen.Search.route) }
-            ) {
-                SearchBar(enabled = false)
-            }
-        }
-        item { PromoBanners(banners = uiState.promoBanners, isLoading = uiState.isLoading) }
-        item {
-            SectionHeader(title = "Kategori")
-            CategoryChips(
-                categories = uiState.categories,
-                isLoading = uiState.isLoading,
-                onCategoryClick = { categoryId ->
-                    navController.navigate(Screen.Menu.createRoute(categoryId))
-                }
-            )
-        }
-        item {
-            SectionHeader(title = "Rekomendasi Untukmu")
-            MenuItemCarousel(
-                items = uiState.recommendedItems,
-                isLoading = uiState.isLoading,
-                onItemClick = { menuItemId ->
-                    navController.navigate(Screen.MenuItemDetail.createRoute(menuItemId))
-                }
-            )
-        }
-
-        // ==========================================================
-        // ===       BAGIAN MENU YANG TELAH DIPERBAIKI            ===
-        // ==========================================================
-        item {
-            SectionHeader(title = "Menu", modifier = Modifier.padding(top = 16.dp))
-        }
-
         if (uiState.isLoading) {
-            // Tampilkan placeholder loading jika sedang memuat
-            items(2) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Box(modifier = Modifier.weight(1f)) {
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(220.dp),
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-                        ) {}
-                    }
-                    Box(modifier = Modifier.weight(1f)) {
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(220.dp),
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-                        ) {}
-                    }
-                }
-                Spacer(Modifier.height(12.dp))
-            }
-        } else if (uiState.allMenuItems.isEmpty()) {
-            // Tampilkan pesan jika tidak ada menu
+            // Shimmering UI when loading
+            item { ShimmerWelcomeHeader() }
+            item { ShimmerSearchBar() }
+            item { ShimmerPromoBanners() }
+            item { SectionHeader(title = "Kategori") }
+            item { ShimmerCategoryChips() }
+            item { SectionHeader(title = "Rekomendasi Untukmu") }
+            item { ShimmerMenuItemCarousel() }
+        } else if (uiState.error != null) {
+            // Error state
             item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 40.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "Menu belum tersedia.",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                Box(modifier = Modifier.fillParentMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(text = uiState.error!!)
                 }
             }
         } else {
-            // Tampilkan menu dalam grid 2 kolom
-            items(uiState.allMenuItems.chunked(2)) { rowItems ->
-                Row(
+            // Content loaded successfully
+            item { WelcomeHeader() }
+            item {
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .clickable { navController.navigate(Screen.Search.route) }
                 ) {
-                    rowItems.forEach { menuItem ->
-                        Box(modifier = Modifier.weight(1f)) {
-                            MenuItemCard(
-                                item = menuItem,
-                                modifier = Modifier.fillMaxWidth(),
-                                onClick = {
-                                    navController.navigate(
-                                        Screen.MenuItemDetail.createRoute(
-                                            menuItem.id
-                                        )
-                                    )
-                                }
-                            )
-                        }
-                    }
-                    // Jika jumlah item ganjil, tambahkan Spacer agar rata kiri
-                    if (rowItems.size < 2) {
-                        Spacer(Modifier.weight(1f))
+                    SearchBar(enabled = false)
+                }
+            }
+            item { PromoBanners(banners = uiState.promoBanners) }
+            item {
+                SectionHeader(title = "Kategori")
+                CategoryChips(categories = uiState.categories, onCategoryClick = { categoryId, categoryName ->
+                    navController.navigate(Screen.Menu.createRoute(categoryId, categoryName))
+                })
+            }
+            item {
+                SectionHeader(title = "Rekomendasi Untukmu")
+                MenuItemCarousel(items = uiState.recommendedItems, onItemClick = { menuItemId ->
+                    navController.navigate(Screen.MenuItemDetail.createRoute(menuItemId))
+                })
+            }
+
+            // All Menu Items Section
+            item {
+                SectionHeader(title = "Menu", modifier = Modifier.padding(top = 16.dp))
+            }
+
+            if (uiState.allMenuItems.isEmpty()) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 40.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Menu belum tersedia.",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
                 }
-                Spacer(Modifier.height(12.dp))
+            } else {
+                items(uiState.allMenuItems.chunked(2)) { rowItems ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        rowItems.forEach { menuItem ->
+                            Box(modifier = Modifier.weight(1f)) {
+                                MenuItemCard(item = menuItem, onClick = {
+                                    navController.navigate(Screen.MenuItemDetail.createRoute(menuItem.id))
+                                })
+                            }
+                        }
+                        if (rowItems.size < 2) {
+                            Spacer(Modifier.weight(1f))
+                        }
+                    }
+                    Spacer(Modifier.height(12.dp))
+                }
             }
         }
     }
@@ -234,18 +203,7 @@ fun SearchBar(modifier: Modifier = Modifier, enabled: Boolean = true) {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun PromoBanners(banners: List<PromoBanner>, isLoading: Boolean) {
-    if (isLoading) {
-        Box(
-            modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-                .fillMaxWidth()
-                .height(150.dp)
-                .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(16.dp))
-        )
-        return
-    }
-
+fun PromoBanners(banners: List<PromoBanner>) {
     if (banners.isEmpty()) {
         return
     }
@@ -317,35 +275,20 @@ fun SectionHeader(title: String, modifier: Modifier = Modifier) {
 
 @Composable
 fun CategoryChips(
-    categories: List<com.mieso.app.data.model.FoodCategory>,
-    isLoading: Boolean,
-    onCategoryClick: (categoryId: String) -> Unit
+    categories: List<FoodCategory>,
+    onCategoryClick: (categoryId: String, categoryName: String) -> Unit
 ) {
     LazyRow(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         contentPadding = PaddingValues(vertical = 4.dp, horizontal = 16.dp)
     ) {
-        if (isLoading) {
-            items(5) {
-                Box(
-                    modifier = Modifier
-                        .width(100.dp)
-                        .height(40.dp)
-                        .background(
-                            MaterialTheme.colorScheme.surfaceVariant,
-                            RoundedCornerShape(8.dp)
-                        )
-                )
-            }
-        } else {
-            items(categories, key = { it.id }) { category ->
-                FilterChip(
-                    selected = false,
-                    onClick = { onCategoryClick(category.id) },
-                    label = { Text(category.name) }
-                )
-            }
+        items(categories, key = { it.id }) { category ->
+            FilterChip(
+                selected = false,
+                onClick = { onCategoryClick(category.id, category.name) },
+                label = { Text(category.name) }
+            )
         }
     }
 }
@@ -353,8 +296,8 @@ fun CategoryChips(
 @Composable
 fun MenuItemCarousel(
     items: List<MenuItem>,
-    isLoading: Boolean,
-    onItemClick: (menuItemId: String) -> Unit
+    onItemClick: (menuItemId: String) -> Unit,
+    isLoading: Boolean = false
 ) {
     LazyRow(
         contentPadding = PaddingValues(horizontal = 16.dp),
@@ -363,11 +306,11 @@ fun MenuItemCarousel(
         if (isLoading) {
             items(3) {
                 Card(
-                    modifier = Modifier.width(160.dp),
+                    modifier = Modifier
+                        .width(160.dp)
+                        .height(220.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-                ) {
-                    Spacer(modifier = Modifier.height(220.dp))
-                }
+                ) {}
             }
         } else {
             items(items, key = { it.id }) { item ->
@@ -389,24 +332,34 @@ fun MenuItemCard(
 ) {
     Card(
         onClick = onClick,
-        modifier = modifier,
-        shape = RoundedCornerShape(12.dp)
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Column {
+        Column(modifier = Modifier.fillMaxWidth()) {
             AsyncImage(
                 model = item.imageUrl,
                 contentDescription = item.name,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(120.dp)
+                    .height(125.dp)
             )
-            Column(modifier = Modifier.padding(12.dp)) {
-                Text(text = item.name, style = MaterialTheme.typography.titleSmall, maxLines = 1)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp)
+            ) {
+                Text(
+                    text = item.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    maxLines = 1,
+                    fontWeight = FontWeight.Bold
+                )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = formatToRupiah(item.price),
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -415,9 +368,88 @@ fun MenuItemCard(
     }
 }
 
+
 fun formatToRupiah(price: Long): String {
     val localeID = Locale("in", "ID")
     val formatter = NumberFormat.getCurrencyInstance(localeID)
     formatter.maximumFractionDigits = 0
     return formatter.format(price)
+}
+
+// --- Shimmer Placeholder Composables ---
+
+@Composable
+private fun ShimmerWelcomeHeader() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .shimmer()
+    ) {
+        Spacer(
+            modifier = Modifier
+                .height(30.dp)
+                .fillMaxWidth(0.6f)
+                .background(Color.Gray)
+        )
+        Spacer(Modifier.height(8.dp))
+        Spacer(
+            modifier = Modifier
+                .height(20.dp)
+                .fillMaxWidth(0.8f)
+                .background(Color.Gray)
+        )
+    }
+}
+
+@Composable
+private fun ShimmerSearchBar() {
+    Spacer(
+        modifier = Modifier
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .fillMaxWidth()
+            .height(56.dp)
+            .clip(MaterialTheme.shapes.extraLarge)
+            .background(Color.Gray)
+            .shimmer()
+    )
+}
+
+@Composable
+private fun ShimmerPromoBanners() {
+    Spacer(
+        modifier = Modifier
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .fillMaxWidth()
+            .height(150.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(Color.Gray)
+            .shimmer()
+    )
+}
+
+@Composable
+private fun ShimmerCategoryChips() {
+    LazyRow(
+        modifier = Modifier
+            .fillMaxWidth()
+            .shimmer(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        contentPadding = PaddingValues(vertical = 4.dp, horizontal = 16.dp)
+    ) {
+        items(5) {
+            Spacer(
+                modifier = Modifier
+                    .width(100.dp)
+                    .height(40.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color.Gray)
+            )
+        }
+    }
+}
+
+@Composable
+private fun ShimmerMenuItemCarousel() {
+    MenuItemCarousel(items = emptyList(), isLoading = true, onItemClick = {})
 }
