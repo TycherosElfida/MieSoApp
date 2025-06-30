@@ -80,7 +80,11 @@ fun ProfileScreen(
     var isEditing by remember { mutableStateOf(false) }
 
     var username by remember(user?.username) { mutableStateOf(user?.username ?: "") }
-    var profilePictureUrl by remember(user?.profilePictureUrl) { mutableStateOf(user?.profilePictureUrl ?: "") }
+    var profilePictureUrl by remember(user?.profilePictureUrl) {
+        mutableStateOf(
+            user?.profilePictureUrl ?: ""
+        )
+    }
 
     val context = LocalContext.current
 
@@ -142,7 +146,9 @@ fun ProfileScreen(
             item {
                 if (user == null) {
                     Box(
-                        modifier = Modifier.fillMaxWidth().height(200.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator()
@@ -159,7 +165,12 @@ fun ProfileScreen(
                 }
             }
 
-            item { HorizontalDivider(thickness = 8.dp, color = MaterialTheme.colorScheme.surfaceVariant) }
+            item {
+                HorizontalDivider(
+                    thickness = 8.dp,
+                    color = MaterialTheme.colorScheme.surfaceVariant
+                )
+            }
 
             // Menu Akun
             item {
@@ -180,7 +191,10 @@ fun ProfileScreen(
             // Integrasi Admin Dashboard
             if (user?.role == "admin") {
                 item {
-                    HorizontalDivider(thickness = 8.dp, color = MaterialTheme.colorScheme.surfaceVariant)
+                    HorizontalDivider(
+                        thickness = 8.dp,
+                        color = MaterialTheme.colorScheme.surfaceVariant
+                    )
                     ProfileMenuSection(title = "Panel Admin") {
                         ProfileMenuItem(
                             text = "Admin Dashboard",
@@ -191,7 +205,12 @@ fun ProfileScreen(
                 }
             }
 
-            item { HorizontalDivider(thickness = 8.dp, color = MaterialTheme.colorScheme.surfaceVariant) }
+            item {
+                HorizontalDivider(
+                    thickness = 8.dp,
+                    color = MaterialTheme.colorScheme.surfaceVariant
+                )
+            }
 
             // Menu Informasi
             item {
@@ -220,7 +239,9 @@ fun ProfileScreen(
                 Box(modifier = Modifier.padding(horizontal = 16.dp)) {
                     Button(
                         onClick = { showLogoutDialog = true },
-                        modifier = Modifier.fillMaxWidth().height(50.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.errorContainer,
                             contentColor = MaterialTheme.colorScheme.onErrorContainer
@@ -276,7 +297,9 @@ private fun ProfileHeader(
     onProfilePictureUrlChange: (String) -> Unit
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -284,7 +307,10 @@ private fun ProfileHeader(
             model = if (isEditing) profilePictureUrl.ifBlank { userData.profilePictureUrl } else userData.profilePictureUrl,
             contentDescription = "Foto Profil",
             contentScale = ContentScale.Crop,
-            modifier = Modifier.size(96.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceVariant)
+            modifier = Modifier
+                .size(96.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.surfaceVariant)
         )
 
         if (isEditing) {

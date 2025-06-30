@@ -159,8 +159,11 @@ private fun AdminOrderCard(order: Order, onStatusClick: () -> Unit) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
-            // ... Sisa kode card tidak berubah ...
-            Text("Customer Info:", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+            Text(
+                "Customer Info:",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold
+            )
             Text(text = "User ID: ${order.userId}", style = MaterialTheme.typography.bodyMedium)
             order.shippingAddress?.let {
                 Text(
@@ -172,9 +175,16 @@ private fun AdminOrderCard(order: Order, onStatusClick: () -> Unit) {
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Text("Items:", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+            Text(
+                "Items:",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold
+            )
             order.items.forEach { cartItem ->
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
                     Text(
                         text = "${cartItem.quantity}x ${cartItem.menuItem.name}",
                         style = MaterialTheme.typography.bodyMedium,
@@ -234,8 +244,13 @@ private fun OrderStatusChip(status: String, onClick: () -> Unit, enabled: Boolea
 }
 
 @Composable
-private fun UpdateStatusDialog(order: Order, onDismiss: () -> Unit, onConfirm: (newStatus: String) -> Unit) {
-    val nextStatus = if (order.status.equals("Pending", ignoreCase = true)) "Completed" else "Pending"
+private fun UpdateStatusDialog(
+    order: Order,
+    onDismiss: () -> Unit,
+    onConfirm: (newStatus: String) -> Unit
+) {
+    val nextStatus =
+        if (order.status.equals("Pending", ignoreCase = true)) "Completed" else "Pending"
 
     AlertDialog(
         onDismissRequest = onDismiss,

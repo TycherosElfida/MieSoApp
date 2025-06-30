@@ -86,7 +86,10 @@ fun AddEditPromoBannerScreen(
             AsyncImage(
                 model = uiState.imageUrl, // <-- Gunakan state yang sudah diubah
                 contentDescription = "Promo Banner Image",
-                modifier = Modifier.fillMaxWidth().height(200.dp).align(Alignment.CenterHorizontally),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .align(Alignment.CenterHorizontally),
                 contentScale = ContentScale.Crop
             )
 
@@ -105,7 +108,9 @@ fun AddEditPromoBannerScreen(
                     viewModel.savePromoBanner()
                     navController.popBackStack()
                 },
-                modifier = Modifier.fillMaxWidth().height(50.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
                 enabled = !uiState.isSaving
             ) {
                 if (uiState.isSaving) {

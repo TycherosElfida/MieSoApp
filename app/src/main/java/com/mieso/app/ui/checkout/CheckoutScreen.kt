@@ -97,12 +97,15 @@ fun CheckoutScreen(
                         ServiceType.DELIVERY -> {
                             navController.navigate(Screen.DeliveryDetails.route)
                         }
+
                         ServiceType.DINE_IN -> {
                             //belom-an
                         }
+
                         ServiceType.TAKE_AWAY -> {
                             navController.navigate(Screen.Payment.route)
                         }
+
                         ServiceType.NONE -> {
 
                         }

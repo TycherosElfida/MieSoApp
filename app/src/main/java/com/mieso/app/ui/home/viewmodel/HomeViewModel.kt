@@ -29,7 +29,12 @@ class HomeViewModel @Inject constructor(
                 if (user != null) {
                     loadHomeScreenData()
                 } else {
-                    _uiState.update { HomeUiState(isLoading = false, error = "User not logged in.") }
+                    _uiState.update {
+                        HomeUiState(
+                            isLoading = false,
+                            error = "User not logged in."
+                        )
+                    }
                 }
             }
         }

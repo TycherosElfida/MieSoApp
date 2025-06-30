@@ -73,7 +73,9 @@ fun CartScreen(
     ) { paddingValues ->
         if (uiState.cartItems.isEmpty()) {
             Box(
-                modifier = Modifier.fillMaxSize().padding(paddingValues),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
                 contentAlignment = Alignment.Center
             ) {
                 Text(

@@ -85,8 +85,13 @@ fun SearchScreen(
                     CircularProgressIndicator()
                 }
             }
+
             uiState.searchResults.isEmpty() && !uiState.isSearching -> {
-                Box(Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .padding(16.dp), contentAlignment = Alignment.Center
+                ) {
                     Text(
                         text = if (uiState.searchQuery.isNotBlank()) "Menu tidak ditemukan" else "Mulai cari bakso atau mie ayam kesukaanmu!",
                         style = MaterialTheme.typography.bodyLarge,
@@ -95,10 +100,13 @@ fun SearchScreen(
                     )
                 }
             }
+
             else -> {
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(2), // Menetapkan 2 kolom
-                    modifier = Modifier.fillMaxSize().padding(paddingValues),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)

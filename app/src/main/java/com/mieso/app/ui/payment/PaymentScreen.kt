@@ -144,11 +144,22 @@ private fun AddressSection(address: UserAddress?) {
     Card {
         if (address != null) {
             Row(Modifier.padding(16.dp)) {
-                Icon(Icons.Outlined.Home, contentDescription = "Address", modifier = Modifier.padding(end = 16.dp))
+                Icon(
+                    Icons.Outlined.Home,
+                    contentDescription = "Address",
+                    modifier = Modifier.padding(end = 16.dp)
+                )
                 Column {
-                    Text(address.label, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+                    Text(
+                        address.label,
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold
+                    )
                     Text(address.addressLine1, style = MaterialTheme.typography.bodyMedium)
-                    Text("${address.city}, ${address.postalCode}", style = MaterialTheme.typography.bodyMedium)
+                    Text(
+                        "${address.city}, ${address.postalCode}",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
             }
         } else {
@@ -160,7 +171,9 @@ private fun AddressSection(address: UserAddress?) {
 @Composable
 private fun OrderItemRow(item: CartItem) {
     Row(
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp).fillMaxWidth(),
+        modifier = Modifier
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -174,11 +187,21 @@ private fun PaymentMethodSection() {
     SectionHeader(title = "Metode Pembayaran")
     Card {
         Row(
-            Modifier.fillMaxWidth().padding(16.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(Icons.Outlined.Money, contentDescription = "Payment Method", modifier = Modifier.padding(end = 16.dp))
-            Text("Cash on Delivery (COD)", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
+            Icon(
+                Icons.Outlined.Money,
+                contentDescription = "Payment Method",
+                modifier = Modifier.padding(end = 16.dp)
+            )
+            Text(
+                "Cash on Delivery (COD)",
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.SemiBold
+            )
         }
     }
 }
@@ -212,7 +235,9 @@ private fun SummaryRow(label: String, value: String, isTotal: Boolean = false) {
 private fun PaymentFooter(totalPrice: Long, isLoading: Boolean, onPlaceOrderClicked: () -> Unit) {
     Surface(shadowElevation = 8.dp) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {

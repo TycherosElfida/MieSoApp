@@ -82,7 +82,10 @@ fun DeliveryDetailsScreen(
         bottomBar = {
             Button(
                 onClick = { navController.navigate(Screen.Payment.route) },
-                modifier = Modifier.fillMaxWidth().padding(16.dp).height(50.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                    .height(50.dp),
                 enabled = uiState.selectedAddress != null
             ) {
                 Text("Lanjutkan ke Pembayaran")
@@ -142,9 +145,17 @@ private fun ActionCard(title: String, icon: ImageVector, onClick: () -> Unit) {
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(imageVector = icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary
+            )
             Spacer(Modifier.width(16.dp))
-            Text(text = title, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.SemiBold
+            )
         }
     }
 }
@@ -172,7 +183,10 @@ private fun AddressCard(
             Spacer(Modifier.height(4.dp))
             Text(address.addressLine1, style = MaterialTheme.typography.bodyMedium)
             address.addressLine2?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }
-            Text("${address.city}, ${address.postalCode}", style = MaterialTheme.typography.bodyMedium)
+            Text(
+                "${address.city}, ${address.postalCode}",
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
     }
 }

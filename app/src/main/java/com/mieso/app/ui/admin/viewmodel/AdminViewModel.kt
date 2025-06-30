@@ -129,11 +129,22 @@ class AdminViewModel @Inject constructor(
             }
         }
     }
+
     fun onNameChanged(name: String) = _addEditScreenUiState.update { it.copy(name = name) }
-    fun onDescriptionChanged(description: String) = _addEditScreenUiState.update { it.copy(description = description) }
+    fun onDescriptionChanged(description: String) =
+        _addEditScreenUiState.update { it.copy(description = description) }
+
     fun onPriceChanged(price: String) = _addEditScreenUiState.update { it.copy(price = price) }
-    fun onCategoryChanged(categoryId: String, categoryName: String) = _addEditScreenUiState.update { it.copy(categoryId = categoryId, categoryName = categoryName) }
-    fun onIsRecommendedChanged(isRecommended: Boolean) = _addEditScreenUiState.update { it.copy(isRecommended = isRecommended) }
+    fun onCategoryChanged(categoryId: String, categoryName: String) = _addEditScreenUiState.update {
+        it.copy(
+            categoryId = categoryId,
+            categoryName = categoryName
+        )
+    }
+
+    fun onIsRecommendedChanged(isRecommended: Boolean) =
+        _addEditScreenUiState.update { it.copy(isRecommended = isRecommended) }
+
     fun onImageUrlChanged(url: String) = _addEditScreenUiState.update { it.copy(imageUrl = url) }
 
     fun saveMenuItem() {
@@ -165,7 +176,10 @@ class AdminViewModel @Inject constructor(
 
     fun saveCategory(categoryToEdit: FoodCategory?, name: String, order: Int) {
         viewModelScope.launch {
-            val category = categoryToEdit?.copy(name = name, order = order) ?: FoodCategory(name = name, order = order)
+            val category = categoryToEdit?.copy(name = name, order = order) ?: FoodCategory(
+                name = name,
+                order = order
+            )
             if (categoryToEdit != null) {
                 homeRepository.updateCategory(category)
             } else {
@@ -192,9 +206,15 @@ class AdminViewModel @Inject constructor(
             }
         }
     }
-    fun onBannerOrderChanged(order: String) = _addEditBannerUiState.update { it.copy(order = order) }
-    fun onBannerTargetChanged(target: String) = _addEditBannerUiState.update { it.copy(targetScreen = target) }
-    fun onBannerImageUrlChanged(url: String) = _addEditBannerUiState.update { it.copy(imageUrl = url) }
+
+    fun onBannerOrderChanged(order: String) =
+        _addEditBannerUiState.update { it.copy(order = order) }
+
+    fun onBannerTargetChanged(target: String) =
+        _addEditBannerUiState.update { it.copy(targetScreen = target) }
+
+    fun onBannerImageUrlChanged(url: String) =
+        _addEditBannerUiState.update { it.copy(imageUrl = url) }
 
     fun savePromoBanner() {
         viewModelScope.launch {

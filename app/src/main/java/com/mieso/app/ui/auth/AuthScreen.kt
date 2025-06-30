@@ -1,34 +1,36 @@
-@file:Suppress("DEPRECATION")
-
 package com.mieso.app.ui.auth
 
 import android.widget.Toast
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -41,8 +43,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -51,237 +52,253 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mieso.app.R
-import com.mieso.app.data.auth.SignInResult
-import com.mieso.app.ui.theme.BrandRedOrange
-import com.mieso.app.ui.theme.BrandYellow
+import com.mieso.app.data.common.Resource
 
 @Composable
-fun AuthScreen(
-    onSignInSuccess: () -> Unit
-) {
+fun AuthScreen(onSignInSuccess: () -> Unit) {
     val viewModel: AuthViewModel = hiltViewModel()
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
+    val authResult = state.authResult
 
-    // This LaunchedEffect handles the result of any sign-in attempt (Google or Email).
-    LaunchedEffect(key1 = state.signInResult) {
-        state.signInResult?.let { result ->
-            when (result) {
-                is SignInResult.Success -> {
-                    Toast.makeText(context, "Sign in successful!", Toast.LENGTH_SHORT).show()
-                    onSignInSuccess()
-                }
-                is SignInResult.Error -> {
-                    Toast.makeText(context, result.message, Toast.LENGTH_LONG).show()
-                }
-            }
-            viewModel.resetSignInResult()
+    LaunchedEffect(key1 = authResult) {
+        if (authResult is Resource.Success) {
+            Toast.makeText(context, "Sign in successful!", Toast.LENGTH_SHORT).show()
+            onSignInSuccess()
+            viewModel.resetAuthResult()
+        } else if (authResult is Resource.Error) {
+            Toast.makeText(context, authResult.message, Toast.LENGTH_LONG).show()
+            viewModel.resetAuthResult()
         }
     }
 
-    // Main screen layout with a gradient background.
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(BrandRedOrange.copy(alpha = 0.9f), BrandYellow.copy(alpha = 0.7f))
-                )
-            ),
-        contentAlignment = Alignment.Center
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .navigationBarsPadding()
+                .imePadding()
+                .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.weight(0.5f))
+            AuthHeader()
 
-            // App Logo / Title
-            Text(
-                text = "MieSo",
-                fontSize = 56.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
-            Text(
-                text = "Rasa Juara, Harga Bersahaja",
-                fontSize = 18.sp,
-                color = Color.White.copy(alpha = 0.9f),
-                modifier = Modifier.padding(bottom = 32.dp)
-            )
-
-            Surface(
-                shape = RoundedCornerShape(16.dp),
-                shadowElevation = 8.dp,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                AnimatedContent(
-                    targetState = state.authMode,
-                    label = "AuthFormAnimation"
-                ) { authMode ->
-                    EmailAuthForm(
-                        state = state,
-                        onEmailChanged = viewModel::onEmailChanged,
-                        onPasswordChanged = viewModel::onPasswordChanged,
-                        onAuthClick = viewModel::onEmailAuthClick,
-                        onModeToggled = viewModel::onAuthModeToggled
-                    )
-                }
+            AnimatedContent(
+                targetState = state.authMode,
+                label = "AuthFormAnimation"
+            ) { targetAuthMode ->
+                AuthForm(
+                    authMode = targetAuthMode,
+                    state = state,
+                    viewModel = viewModel
+                )
             }
 
             AuthDivider()
 
             GoogleSignInButton(
-                isLoading = state.isSigningIn && state.signInResult == null, // Show loader only for Google sign-in
+                isLoading = state.authResult is Resource.Loading,
                 onClick = viewModel::onGoogleSignInClick
             )
 
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }
 
 @Composable
-private fun EmailAuthForm(
+private fun AuthHeader() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 48.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Image(
+            painter = painterResource(id = R.mipmap.ic_launcher_foreground),
+            contentDescription = "App Logo",
+            modifier = Modifier
+                .size(100.dp)
+                .clip(RoundedCornerShape(24.dp))
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = "MieSo",
+            style = MaterialTheme.typography.headlineLarge,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary
+        )
+        Text(
+            text = "Rasa Juara, Harga Bersahaja",
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+        )
+    }
+}
+
+@Composable
+private fun AuthForm(
+    authMode: AuthMode,
     state: AuthScreenState,
-    onEmailChanged: (String) -> Unit,
-    onPasswordChanged: (String) -> Unit,
-    onAuthClick: () -> Unit,
-    onModeToggled: () -> Unit,
+    viewModel: AuthViewModel
 ) {
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier.padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
-            text = if (state.authMode == AuthMode.SIGN_IN) "Sign In" else "Create Account",
+            text = if (authMode == AuthMode.SIGN_IN) "Welcome Back" else "Create an Account",
             style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Medium
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
         OutlinedTextField(
             value = state.email,
-            onValueChange = onEmailChanged,
+            onValueChange = viewModel::onEmailChanged,
             modifier = Modifier.fillMaxWidth(),
             label = { Text("Email Address") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             isError = state.emailError != null,
-            singleLine = true
+            singleLine = true,
+            shape = RoundedCornerShape(12.dp)
         )
         if (state.emailError != null) {
             Text(
                 text = state.emailError,
                 color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.align(Alignment.Start)
+                style = MaterialTheme.typography.labelMedium,
+                modifier = Modifier
+                    .padding(start = 16.dp, top = 4.dp)
+                    .align(Alignment.Start)
             )
         }
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
             value = state.password,
-            onValueChange = onPasswordChanged,
+            onValueChange = viewModel::onPasswordChanged,
             modifier = Modifier.fillMaxWidth(),
             label = { Text("Password") },
             isError = state.passwordError != null,
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             trailingIcon = {
-                val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                val image =
+                    if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
                     Icon(imageVector = image, contentDescription = "Toggle password visibility")
                 }
-            }
+            },
+            shape = RoundedCornerShape(12.dp)
         )
         if (state.passwordError != null) {
             Text(
                 text = state.passwordError,
                 color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.align(Alignment.Start)
+                style = MaterialTheme.typography.labelMedium,
+                modifier = Modifier
+                    .padding(start = 16.dp, top = 4.dp)
+                    .align(Alignment.Start)
             )
         }
         Spacer(modifier = Modifier.height(24.dp))
 
+        val isLoading = state.authResult is Resource.Loading
         Button(
-            onClick = onAuthClick,
-            enabled = !state.isSigningIn,
+            onClick = viewModel::onEmailAuthClick,
+            enabled = !isLoading,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(50.dp)
+                .height(50.dp),
+            shape = RoundedCornerShape(12.dp)
         ) {
-            if (state.isSigningIn && state.signInResult == null) {
-                CircularProgressIndicator(modifier = Modifier.size(24.dp), color = MaterialTheme.colorScheme.onPrimary)
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
             } else {
-                Text(if (state.authMode == AuthMode.SIGN_IN) "Sign In" else "Sign Up", fontSize = 16.sp)
+                Text(
+                    if (authMode == AuthMode.SIGN_IN) "Sign In" else "Sign Up",
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
 
-        val annotatedString = buildAnnotatedString {
-            withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onSurfaceVariant)) {
-                append(if (state.authMode == AuthMode.SIGN_IN) "Don't have an account? " else "Already have an account? ")
-            }
-            withStyle(style = SpanStyle(color = BrandRedOrange, fontWeight = FontWeight.Bold)) {
-                append(if (state.authMode == AuthMode.SIGN_IN) "Sign Up" else "Sign In")
-            }
-        }
-
-        ClickableText(
-            text = annotatedString,
-            onClick = { onModeToggled() }
-        )
+        ToggleAuthModeText(authMode = authMode, onToggle = viewModel::onAuthModeToggled)
     }
+}
+
+@Composable
+private fun ToggleAuthModeText(authMode: AuthMode, onToggle: () -> Unit) {
+    val annotatedString = buildAnnotatedString {
+        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))) {
+            append(if (authMode == AuthMode.SIGN_IN) "Don't have an account? " else "Already have an account? ")
+        }
+        withStyle(
+            style = SpanStyle(
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold
+            )
+        ) {
+            append(if (authMode == AuthMode.SIGN_IN) "Sign Up" else "Sign In")
+        }
+    }
+    ClickableText(
+        text = annotatedString,
+        onClick = { onToggle() },
+        style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center)
+    )
 }
 
 @Composable
 private fun AuthDivider() {
     Row(
-        modifier = Modifier.padding(vertical = 16.dp),
+        modifier = Modifier.padding(vertical = 24.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         HorizontalDivider(
             modifier = Modifier.weight(1f),
-            color = Color.White.copy(alpha = 0.5f)
+            thickness = DividerDefaults.Thickness,
+            color = DividerDefaults.color
         )
         Text(
             text = "OR",
             modifier = Modifier.padding(horizontal = 8.dp),
-            color = Color.White,
-            fontWeight = FontWeight.Bold
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+            style = MaterialTheme.typography.bodySmall
         )
         HorizontalDivider(
             modifier = Modifier.weight(1f),
-            color = Color.White.copy(alpha = 0.5f)
+            thickness = DividerDefaults.Thickness,
+            color = DividerDefaults.color
         )
     }
 }
 
 @Composable
-private fun GoogleSignInButton(
-    isLoading: Boolean,
-    onClick: () -> Unit
-) {
-    Button(
+private fun GoogleSignInButton(isLoading: Boolean, onClick: () -> Unit) {
+    OutlinedButton(
         onClick = onClick,
         enabled = !isLoading,
-        modifier = Modifier.fillMaxWidth().height(54.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(50.dp),
         shape = RoundedCornerShape(12.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black),
-        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
     ) {
         if (isLoading) {
-            CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp, color = BrandRedOrange)
+            CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
         } else {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -290,13 +307,13 @@ private fun GoogleSignInButton(
                 Image(
                     painter = painterResource(id = R.drawable.ic_google_logo),
                     contentDescription = "Google Logo",
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(22.dp)
                 )
                 Text(
-                    text = "Sign in with Google",
+                    text = "Continue with Google",
                     modifier = Modifier.padding(start = 12.dp),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
         }

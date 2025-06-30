@@ -21,7 +21,9 @@ class HomeRepositoryImpl @Inject constructor(
             firestore.collection("promoBanners")
                 .orderBy("order", Query.Direction.ASCENDING)
                 .get().await().toObjects(PromoBanner::class.java)
-        } catch (e: Exception) { emptyList() }
+        } catch (e: Exception) {
+            emptyList()
+        }
     }
 
     override suspend fun getCategories(): List<FoodCategory> {
@@ -29,7 +31,9 @@ class HomeRepositoryImpl @Inject constructor(
             firestore.collection("categories")
                 .orderBy("order", Query.Direction.ASCENDING)
                 .get().await().toObjects(FoodCategory::class.java)
-        } catch (e: Exception) { emptyList() }
+        } catch (e: Exception) {
+            emptyList()
+        }
     }
 
     override suspend fun getRecommendedItems(): List<MenuItem> {
@@ -37,7 +41,9 @@ class HomeRepositoryImpl @Inject constructor(
             firestore.collection("menuItems")
                 .whereEqualTo("isRecommended", true)
                 .limit(10).get().await().toObjects(MenuItem::class.java)
-        } catch (e: Exception) { emptyList() }
+        } catch (e: Exception) {
+            emptyList()
+        }
     }
 
     override suspend fun getMenuItemsByCategory(categoryId: String): List<MenuItem> {

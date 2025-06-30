@@ -72,7 +72,13 @@ fun AdminMenuScreen(
             items(uiState) { menuItem ->
                 AdminMenuItem(
                     menuItem = menuItem,
-                    onEditClick = { navController.navigate(Screen.AddEditMenuItem.createRoute(menuItem.id)) },
+                    onEditClick = {
+                        navController.navigate(
+                            Screen.AddEditMenuItem.createRoute(
+                                menuItem.id
+                            )
+                        )
+                    },
                     onDeleteClick = { viewModel.deleteMenuItem(menuItem.id) }
                 )
             }

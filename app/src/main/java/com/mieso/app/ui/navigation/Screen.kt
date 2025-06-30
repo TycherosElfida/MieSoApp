@@ -7,6 +7,7 @@ object NavArguments {
 
 sealed class Screen(val route: String) {
 
+    object Splash : Screen("splash_screen")
     object Login : Screen("login_screen")
     object Main : Screen("main_screen")
     object Home : Screen("home_screen")
@@ -51,6 +52,7 @@ sealed class Screen(val route: String) {
             }
         }
     }
+
     object AdminCategories : Screen("admin_categories_screen")
     object AdminPromoBanners : Screen("admin_promo_banners_screen")
     object AddEditPromoBanner : Screen("add_edit_promo_banner_screen?bannerId={bannerId}") {

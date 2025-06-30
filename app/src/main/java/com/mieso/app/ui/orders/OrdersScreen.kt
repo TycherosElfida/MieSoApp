@@ -68,21 +68,26 @@ fun OrdersScreen(
                 uiState.isLoading -> {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }
+
                 uiState.error != null -> {
                     Text(
                         text = "Error: ${uiState.error}",
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
+
                 uiState.orders.isEmpty() -> {
                     EmptyState()
                 }
+
                 else -> {
                     LazyColumn(
                         contentPadding = PaddingValues(16.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        items(uiState.orders, key = { it.createdAt?.time ?: UUID.randomUUID() }) { order ->
+                        items(
+                            uiState.orders,
+                            key = { it.createdAt?.time ?: UUID.randomUUID() }) { order ->
                             OrderCard(order = order)
                         }
                     }
@@ -117,7 +122,7 @@ private fun OrderCard(order: Order) {
             order.items.take(3).forEach { cartItem ->
                 Text("${cartItem.quantity}x ${cartItem.menuItem.name}")
             }
-            if(order.items.size > 3) {
+            if (order.items.size > 3) {
                 Text("...and more")
             }
 

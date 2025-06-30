@@ -10,7 +10,7 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
-import androidx.compose.ui.graphics.Color // <-- FIX: Added the missing import for Color
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
@@ -38,7 +38,7 @@ private val LightColorScheme = lightColorScheme(
     surface = LightSurface,
     onPrimary = LightOnPrimary,
     onSecondary = LightOnPrimary,
-    onTertiary = LightOnPrimary,
+    onTertiary = DarkOnPrimary, // Text on yellow should be dark for contrast
     onBackground = LightOnBackground,
     onSurface = LightOnSurface,
     outline = LightOutline
@@ -47,8 +47,7 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun MieSoTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false, // Dynamic color is disabled for a more branded experience
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -64,18 +63,9 @@ fun MieSoTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-
-            // FIX: Set the system bars to be transparent. This is the correct
-            // way to handle the deprecation warning. We are telling the system
-            // that we will handle drawing the colors behind the bars.
             window.statusBarColor = Color.Transparent.toArgb()
             window.navigationBarColor = Color.Transparent.toArgb()
-
-            // This is the key to enabling edge-to-edge.
             WindowCompat.setDecorFitsSystemWindows(window, false)
-
-            // This controls the color of the system icons (time, battery, navigation buttons)
-            // to ensure they are visible against our app's background.
             val insetsController = WindowCompat.getInsetsController(window, view)
             insetsController.isAppearanceLightStatusBars = !darkTheme
             insetsController.isAppearanceLightNavigationBars = !darkTheme

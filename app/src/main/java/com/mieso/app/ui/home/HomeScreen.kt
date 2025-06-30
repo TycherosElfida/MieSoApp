@@ -122,13 +122,17 @@ fun HomeScreen(
                 ) {
                     Box(modifier = Modifier.weight(1f)) {
                         Card(
-                            modifier = Modifier.fillMaxWidth().height(220.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(220.dp),
                             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                         ) {}
                     }
                     Box(modifier = Modifier.weight(1f)) {
                         Card(
-                            modifier = Modifier.fillMaxWidth().height(220.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(220.dp),
                             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                         ) {}
                     }
@@ -166,7 +170,11 @@ fun HomeScreen(
                                 item = menuItem,
                                 modifier = Modifier.fillMaxWidth(),
                                 onClick = {
-                                    navController.navigate(Screen.MenuItemDetail.createRoute(menuItem.id))
+                                    navController.navigate(
+                                        Screen.MenuItemDetail.createRoute(
+                                            menuItem.id
+                                        )
+                                    )
                                 }
                             )
                         }
@@ -283,7 +291,8 @@ fun PromoBanners(banners: List<PromoBanner>, isLoading: Boolean) {
             horizontalArrangement = Arrangement.Center
         ) {
             repeat(pagerState.pageCount) { iteration ->
-                val color = if (pagerState.currentPage == iteration) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
+                val color =
+                    if (pagerState.currentPage == iteration) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
                 Box(
                     modifier = Modifier
                         .padding(4.dp)
@@ -323,7 +332,10 @@ fun CategoryChips(
                     modifier = Modifier
                         .width(100.dp)
                         .height(40.dp)
-                        .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
+                        .background(
+                            MaterialTheme.colorScheme.surfaceVariant,
+                            RoundedCornerShape(8.dp)
+                        )
                 )
             }
         } else {

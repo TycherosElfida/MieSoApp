@@ -42,7 +42,8 @@ class CheckoutViewModel @Inject constructor(
             cartRepository.getCartItems().collect { cartItems ->
                 _uiState.update { currentState ->
                     val subtotal = cartItems.sumOf { it.menuItem.price * it.quantity }
-                    val deliveryFee = if (currentState.selectedAddress != null) currentState.deliveryFee else 0L
+                    val deliveryFee =
+                        if (currentState.selectedAddress != null) currentState.deliveryFee else 0L
                     val total = subtotal + deliveryFee
                     currentState.copy(
                         cartItems = cartItems,
@@ -68,7 +69,8 @@ class CheckoutViewModel @Inject constructor(
             _uiState.update {
                 it.copy(
                     userAddresses = addresses,
-                    selectedAddress = addresses.firstOrNull { addr -> addr.isPrimary } ?: addresses.firstOrNull()
+                    selectedAddress = addresses.firstOrNull { addr -> addr.isPrimary }
+                        ?: addresses.firstOrNull()
                 )
             }
         }
@@ -92,16 +94,27 @@ class CheckoutViewModel @Inject constructor(
                         )
                     }
                 } else {
-                    _uiState.update { it.copy(isLoading = false, error = "Gagal mendapatkan detail alamat.") }
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = "Gagal mendapatkan detail alamat."
+                        )
+                    }
                 }
-            } ?: _uiState.update { it.copy(isLoading = false, error = "Gagal mendapatkan lokasi Anda.") }
+            } ?: _uiState.update {
+                it.copy(
+                    isLoading = false,
+                    error = "Gagal mendapatkan lokasi Anda."
+                )
+            }
         }
     }
 
     // Fungsi onAddressSelected sekarang juga perlu memperbarui harga
     fun onAddressSelected(address: UserAddress) {
         _uiState.update { currentState ->
-            val deliveryFee = if (address.label == "Lokasi Saat Ini" || address.id.isNotBlank()) currentState.deliveryFee else 0L
+            val deliveryFee =
+                if (address.label == "Lokasi Saat Ini" || address.id.isNotBlank()) currentState.deliveryFee else 0L
             val total = currentState.subtotal + deliveryFee
             currentState.copy(
                 selectedAddress = address,

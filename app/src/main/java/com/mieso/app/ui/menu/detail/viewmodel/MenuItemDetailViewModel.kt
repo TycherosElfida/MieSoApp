@@ -41,7 +41,12 @@ class MenuItemDetailViewModel @Inject constructor(
                     it.copy(isLoading = false, menuItem = item)
                 }
             } catch (e: Exception) {
-                _uiState.update { it.copy(isLoading = false, error = "Failed to load item details.") }
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = "Failed to load item details."
+                    )
+                }
             }
         }
     }

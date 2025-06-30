@@ -35,7 +35,8 @@ class GoogleAuthHandler(
             val result = credentialManager.getCredential(context, request)
             val credential = result.credential
             if (credential is CustomCredential &&
-                credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+                credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
+            ) {
                 val googleIdToken = GoogleIdTokenCredential.createFrom(credential.data)
                 googleIdToken.idToken
             } else {

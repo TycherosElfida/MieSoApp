@@ -46,7 +46,10 @@ fun HelpCenterScreen(navController: NavController) {
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
-                Text("Frequently Asked Questions (FAQ)", style = MaterialTheme.typography.headlineSmall)
+                Text(
+                    "Frequently Asked Questions (FAQ)",
+                    style = MaterialTheme.typography.headlineSmall
+                )
                 Spacer(Modifier.height(8.dp))
             }
             item {
@@ -84,6 +87,10 @@ private fun HelpItem(question: String, answer: String) {
     Column {
         Text(question, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
         Spacer(Modifier.height(4.dp))
-        Text(answer, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(
+            answer,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }

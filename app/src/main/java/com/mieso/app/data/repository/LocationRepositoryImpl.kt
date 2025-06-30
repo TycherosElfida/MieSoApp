@@ -42,7 +42,11 @@ class LocationRepositoryImpl @Inject constructor(
             }
         }
 
-        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
+        fusedLocationClient.requestLocationUpdates(
+            locationRequest,
+            locationCallback,
+            Looper.getMainLooper()
+        )
 
         awaitClose { fusedLocationClient.removeLocationUpdates(locationCallback) }
     }

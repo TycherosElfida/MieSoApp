@@ -111,7 +111,10 @@ fun AddEditMenuItemScreen(
             AsyncImage(
                 model = uiState.imageUrl, // Gunakan state baru
                 contentDescription = "Menu Item Image",
-                modifier = Modifier.fillMaxWidth().height(200.dp).align(Alignment.CenterHorizontally),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .align(Alignment.CenterHorizontally),
                 contentScale = ContentScale.Crop
             )
             // GANTI TOMBOL DENGAN TEXTFIELD INI
@@ -143,7 +146,9 @@ fun AddEditMenuItemScreen(
                     viewModel.saveMenuItem()
                     navController.popBackStack()
                 },
-                modifier = Modifier.fillMaxWidth().height(50.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
                 enabled = !uiState.isSaving
             ) {
                 if (uiState.isSaving) {
@@ -165,7 +170,8 @@ fun CategoryDropdown(
     onCategorySelected: (String, String) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val selectedCategoryName = categories.find { it.id == selectedCategoryId }?.name ?: "Select Category"
+    val selectedCategoryName =
+        categories.find { it.id == selectedCategoryId }?.name ?: "Select Category"
 
     ExposedDropdownMenuBox(
         expanded = expanded,
@@ -177,7 +183,9 @@ fun CategoryDropdown(
             readOnly = true,
             label = { Text("Category") },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            modifier = Modifier.menuAnchor().fillMaxWidth()
+            modifier = Modifier
+                .menuAnchor()
+                .fillMaxWidth()
         )
         ExposedDropdownMenu(
             expanded = expanded,

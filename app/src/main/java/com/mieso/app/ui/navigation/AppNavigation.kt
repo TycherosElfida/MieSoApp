@@ -39,6 +39,7 @@ import com.mieso.app.ui.search.SearchScreen
 object CheckoutGraph {
     const val route = "checkout_graph"
 }
+
 object AdminGraph {
     const val route = "admin_graph"
 }
@@ -55,8 +56,14 @@ fun AppNavigation(navController: NavHostController) {
         composable(Screen.Orders.route) { OrdersScreen() }
         composable(Screen.Profile.route) { ProfileScreen(navController = navController) }
         composable(Screen.Promo.route) { PromoScreen() }
-        composable(route = Screen.Menu.route, arguments = listOf(navArgument(NavArguments.CATEGORY_ID) { type = NavType.StringType })) { MenuScreen(navController = navController) }
-        composable(route = Screen.MenuItemDetail.route, arguments = listOf(navArgument(NavArguments.MENU_ITEM_ID) { type = NavType.StringType })) { MenuItemDetailScreen(navController = navController) }
+        composable(
+            route = Screen.Menu.route,
+            arguments = listOf(navArgument(NavArguments.CATEGORY_ID) { type = NavType.StringType })
+        ) { MenuScreen(navController = navController) }
+        composable(
+            route = Screen.MenuItemDetail.route,
+            arguments = listOf(navArgument(NavArguments.MENU_ITEM_ID) { type = NavType.StringType })
+        ) { MenuItemDetailScreen(navController = navController) }
         composable(Screen.Cart.route) { CartScreen(navController = navController) }
 
         // --- Grafik Navigasi Checkout ---
@@ -65,17 +72,20 @@ fun AppNavigation(navController: NavHostController) {
             route = CheckoutGraph.route
         ) {
             composable(Screen.Checkout.route) { backStackEntry ->
-                val parentEntry = remember(backStackEntry) { navController.getBackStackEntry(CheckoutGraph.route) }
+                val parentEntry =
+                    remember(backStackEntry) { navController.getBackStackEntry(CheckoutGraph.route) }
                 val checkoutViewModel: CheckoutViewModel = hiltViewModel(parentEntry)
                 CheckoutScreen(navController = navController, viewModel = checkoutViewModel)
             }
             composable(Screen.DeliveryDetails.route) { backStackEntry ->
-                val parentEntry = remember(backStackEntry) { navController.getBackStackEntry(CheckoutGraph.route) }
+                val parentEntry =
+                    remember(backStackEntry) { navController.getBackStackEntry(CheckoutGraph.route) }
                 val checkoutViewModel: CheckoutViewModel = hiltViewModel(parentEntry)
                 DeliveryDetailsScreen(navController = navController, viewModel = checkoutViewModel)
             }
             composable(Screen.Payment.route) { backStackEntry ->
-                val parentEntry = remember(backStackEntry) { navController.getBackStackEntry(CheckoutGraph.route) }
+                val parentEntry =
+                    remember(backStackEntry) { navController.getBackStackEntry(CheckoutGraph.route) }
                 val checkoutViewModel: CheckoutViewModel = hiltViewModel(parentEntry)
                 PaymentScreen(navController = navController, viewModel = checkoutViewModel)
             }
@@ -86,41 +96,52 @@ fun AppNavigation(navController: NavHostController) {
             startDestination = Screen.AdminDashboard.route,
             route = AdminGraph.route
         ) {
-            composable(Screen.AdminDashboard.route) { AdminDashboardScreen(navController = navController)
+            composable(Screen.AdminDashboard.route) {
+                AdminDashboardScreen(navController = navController)
             }
             composable(Screen.AdminManageOrders.route) { backStackEntry ->
-                val parentEntry = remember(backStackEntry) { navController.getBackStackEntry(AdminGraph.route) }
+                val parentEntry =
+                    remember(backStackEntry) { navController.getBackStackEntry(AdminGraph.route) }
                 val adminViewModel: AdminViewModel = hiltViewModel(parentEntry)
                 AdminManageOrdersScreen(navController = navController, viewModel = adminViewModel)
             }
             composable(Screen.AdminMenu.route) { backStackEntry ->
-                val parentEntry = remember(backStackEntry) { navController.getBackStackEntry(AdminGraph.route) }
+                val parentEntry =
+                    remember(backStackEntry) { navController.getBackStackEntry(AdminGraph.route) }
                 val adminViewModel: AdminViewModel = hiltViewModel(parentEntry)
                 AdminMenuScreen(navController, viewModel = adminViewModel)
             }
             composable(Screen.AdminCategories.route) { backStackEntry ->
-                val parentEntry = remember(backStackEntry) { navController.getBackStackEntry(AdminGraph.route) }
+                val parentEntry =
+                    remember(backStackEntry) { navController.getBackStackEntry(AdminGraph.route) }
                 val adminViewModel: AdminViewModel = hiltViewModel(parentEntry)
                 AdminCategoriesScreen(navController = navController, viewModel = adminViewModel)
             }
             composable(Screen.AdminPromoBanners.route) { backStackEntry ->
-                val parentEntry = remember(backStackEntry) { navController.getBackStackEntry(AdminGraph.route) }
+                val parentEntry =
+                    remember(backStackEntry) { navController.getBackStackEntry(AdminGraph.route) }
                 val adminViewModel: AdminViewModel = hiltViewModel(parentEntry)
                 AdminPromoBannersScreen(navController = navController, viewModel = adminViewModel)
             }
             composable(
                 route = Screen.AddEditMenuItem.route,
-                arguments = listOf(navArgument("menuItemId") { type = NavType.StringType; nullable = true })
+                arguments = listOf(navArgument("menuItemId") {
+                    type = NavType.StringType; nullable = true
+                })
             ) { backStackEntry ->
-                val parentEntry = remember(backStackEntry) { navController.getBackStackEntry(AdminGraph.route) }
+                val parentEntry =
+                    remember(backStackEntry) { navController.getBackStackEntry(AdminGraph.route) }
                 val adminViewModel: AdminViewModel = hiltViewModel(parentEntry)
                 AddEditMenuItemScreen(navController = navController, viewModel = adminViewModel)
             }
             composable(
                 route = Screen.AddEditPromoBanner.route,
-                arguments = listOf(navArgument("bannerId") { type = NavType.StringType; nullable = true })
+                arguments = listOf(navArgument("bannerId") {
+                    type = NavType.StringType; nullable = true
+                })
             ) { backStackEntry ->
-                val parentEntry = remember(backStackEntry) { navController.getBackStackEntry(AdminGraph.route) }
+                val parentEntry =
+                    remember(backStackEntry) { navController.getBackStackEntry(AdminGraph.route) }
                 val adminViewModel: AdminViewModel = hiltViewModel(parentEntry)
                 AddEditPromoBannerScreen(navController = navController, viewModel = adminViewModel)
             }

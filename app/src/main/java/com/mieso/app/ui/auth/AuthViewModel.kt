@@ -3,9 +3,11 @@ package com.mieso.app.ui.auth
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mieso.app.data.auth.GoogleAuthHandler
-import com.mieso.app.data.auth.SignInResult
-import com.mieso.app.data.repository.AuthRepository
+import com.mieso.app.data.common.Resource
+import com.mieso.app.data.model.User
+import com.mieso.app.domain.usecase.SignInWithEmailAndPasswordUseCase
+import com.mieso.app.domain.usecase.SignInWithGoogleUseCase
+import com.mieso.app.domain.usecase.SignUpWithEmailAndPasswordUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,14 +25,14 @@ data class AuthScreenState(
     val password: String = "",
     val emailError: String? = null,
     val passwordError: String? = null,
-    val isSigningIn: Boolean = false,
-    val signInResult: SignInResult? = null
+    val authResult: Resource<User>? = null
 )
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val authHandler: GoogleAuthHandler,
-    private val authRepository: AuthRepository
+    private val signInWithGoogleUseCase: SignInWithGoogleUseCase,
+    private val signInWithEmailAndPasswordUseCase: SignInWithEmailAndPasswordUseCase,
+    private val signUpWithEmailAndPasswordUseCase: SignUpWithEmailAndPasswordUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AuthScreenState())
@@ -46,7 +48,8 @@ class AuthViewModel @Inject constructor(
 
     fun onAuthModeToggled() {
         _state.update {
-            val newMode = if (it.authMode == AuthMode.SIGN_IN) AuthMode.SIGN_UP else AuthMode.SIGN_IN
+            val newMode =
+                if (it.authMode == AuthMode.SIGN_IN) AuthMode.SIGN_UP else AuthMode.SIGN_IN
             it.copy(
                 authMode = newMode,
                 emailError = null,
@@ -57,14 +60,9 @@ class AuthViewModel @Inject constructor(
 
     fun onGoogleSignInClick() {
         viewModelScope.launch {
-            _state.update { it.copy(isSigningIn = true) }
-            val idToken = authHandler.signIn()
-            val result = if (idToken != null) {
-                authRepository.firebaseSignInWithGoogle(idToken)
-            } else {
-                SignInResult.Error("Sign-in was cancelled or failed.")
-            }
-            _state.update { it.copy(signInResult = result, isSigningIn = false) }
+            _state.update { it.copy(authResult = Resource.Loading) }
+            val result = signInWithGoogleUseCase()
+            _state.update { it.copy(authResult = result) }
         }
     }
 
@@ -72,18 +70,19 @@ class AuthViewModel @Inject constructor(
         if (!validateInputs()) return
 
         viewModelScope.launch {
-            _state.update { it.copy(isSigningIn = true) }
+            _state.update { it.copy(authResult = Resource.Loading) }
             val result = when (_state.value.authMode) {
-                AuthMode.SIGN_IN -> authRepository.signInWithEmail(
+                AuthMode.SIGN_IN -> signInWithEmailAndPasswordUseCase(
                     _state.value.email,
                     _state.value.password
                 )
-                AuthMode.SIGN_UP -> authRepository.createUserWithEmail(
+
+                AuthMode.SIGN_UP -> signUpWithEmailAndPasswordUseCase(
                     _state.value.email,
                     _state.value.password
                 )
             }
-            _state.update { it.copy(signInResult = result, isSigningIn = false) }
+            _state.update { it.copy(authResult = result) }
         }
     }
 
@@ -108,7 +107,7 @@ class AuthViewModel @Inject constructor(
         return isValid
     }
 
-    fun resetSignInResult() {
-        _state.update { it.copy(signInResult = null) }
+    fun resetAuthResult() {
+        _state.update { it.copy(authResult = null) }
     }
 }
